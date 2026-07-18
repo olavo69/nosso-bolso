@@ -1,4 +1,4 @@
-import type { Pessoa } from '../data/mockData'
+import type { Pessoa, TransactionType } from '../data/mockData'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -26,4 +26,23 @@ export function dataLabel(date: string) {
     day: '2-digit',
     month: 'short',
   })
+}
+
+export function amountDisplay(type: TransactionType, amount: number) {
+  const sign = type === 'receita' ? '+ ' : type === 'investimento' ? '→ ' : '- '
+  return sign + fmt(amount)
+}
+
+export function amountColor(type: TransactionType) {
+  return type === 'receita'
+    ? 'var(--color-receita)'
+    : type === 'investimento'
+      ? 'var(--color-investimento)'
+      : 'var(--color-despesa)'
+}
+
+export function statusColor(status?: string) {
+  return status === 'pendente' || status === 'a receber' || status === 'a aplicar'
+    ? 'var(--color-pendente)'
+    : 'var(--color-status-ok)'
 }

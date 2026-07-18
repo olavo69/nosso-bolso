@@ -1,5 +1,5 @@
-import { months } from '../../data/mockData'
-import type { PeriodMode } from '../../lib/period'
+import { months } from '../data/mockData'
+import type { PeriodMode } from '../lib/period'
 
 const periodOptions: { key: PeriodMode; label: string }[] = [
   { key: 'mes', label: 'Mês' },

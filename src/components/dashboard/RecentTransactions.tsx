@@ -1,6 +1,13 @@
 import { useNavigate } from 'react-router'
 import { hues, type Transaction } from '../../data/mockData'
-import { colorFor, dataLabel, fmt, pessoaLabel, tintFor } from '../../lib/format'
+import {
+  amountColor,
+  amountDisplay,
+  colorFor,
+  dataLabel,
+  pessoaLabel,
+  tintFor,
+} from '../../lib/format'
 
 type RecentTransactionsProps = {
   transactions: Transaction[]
@@ -26,15 +33,6 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
 
       {transactions.map((tx) => {
         const hue = hues[tx.categoria] ?? 0
-        const amountDisplay =
-          (tx.type === 'receita' ? '+ ' : tx.type === 'investimento' ? '→ ' : '- ') +
-          fmt(tx.amount)
-        const amountColor =
-          tx.type === 'receita'
-            ? 'var(--color-receita)'
-            : tx.type === 'investimento'
-              ? 'var(--color-investimento)'
-              : 'var(--color-despesa)'
 
         return (
           <div
@@ -55,9 +53,9 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             </div>
             <div
               className="text-sm font-bold"
-              style={{ color: amountColor }}
+              style={{ color: amountColor(tx.type) }}
             >
-              {amountDisplay}
+              {amountDisplay(tx.type, tx.amount)}
             </div>
           </div>
         )
