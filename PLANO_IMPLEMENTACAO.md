@@ -78,8 +78,8 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [ ] Contexto financeiro do usuário incluído no prompt (transações, categorias, metas)
 
 ## Fase 10 — Perfil
-- [ ] Card de perfil (avatar, nome, e-mail) + card do parceiro vinculado
-- [ ] Card "Preferências" (toggles) + card "Conta" (moeda, plano, sair)
+- [x] Card de perfil (avatar, nome, e-mail) + card do parceiro vinculado
+- [x] Card "Preferências" (toggles) + card "Conta" (moeda, plano, sair)
 
 ## Fase 11 — Deploy & polish
 - [ ] Deploy de produção no Cloudflare Pages
