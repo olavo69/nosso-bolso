@@ -61,8 +61,8 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [x] Card tracejado "+ Nova categoria"
 
 ## Fase 7 — Metas
-- [ ] Grid de cards (nome, prazo, badge %, progresso, guardado/meta)
-- [ ] Card tracejado "+ Nova meta"
+- [x] Grid de cards (nome, prazo, badge %, progresso, guardado/meta)
+- [x] Card tracejado "+ Nova meta"
 
 ## Fase 8 — Modal "Nova transação"
 - [ ] Abas Receita / Despesa / Investimento (categorias mudam por aba)
