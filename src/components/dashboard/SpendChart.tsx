@@ -61,16 +61,18 @@ export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartPro
         {spendChart.map((b) => (
           <div
             key={b.month}
-            className="flex h-full flex-1 flex-col items-center justify-end gap-1.5"
+            className="flex h-full flex-1 flex-col items-center gap-1.5"
             title={b.valueDisplay}
           >
-            <div
-              className="w-full rounded-t-[8px] rounded-b-[3px] transition-[height] duration-500 ease-out"
-              style={{
-                height: `${b.heightPct}%`,
-                background: b.isCurrent ? '#E2DCCB' : '#EFEBE0',
-              }}
-            />
+            <div className="flex w-full flex-1 items-end">
+              <div
+                className="w-full rounded-t-[8px] rounded-b-[3px] transition-[height] duration-500 ease-out"
+                style={{
+                  height: `${b.heightPct}%`,
+                  background: b.isCurrent ? '#E2DCCB' : '#EFEBE0',
+                }}
+              />
+            </div>
             <div className="text-[11px] font-semibold text-text-muted">
               {b.label}
             </div>
