@@ -1,5 +1,109 @@
-import { PlaceholderCard } from '../components/PlaceholderCard'
+import { useMemo } from 'react'
+import { CategoryBars } from '../components/dashboard/CategoryBars'
+import { GoalsInFocus } from '../components/dashboard/GoalsInFocus'
+import { InvestmentsList } from '../components/dashboard/InvestmentsList'
+import { PeriodBar } from '../components/dashboard/PeriodBar'
+import { RecentTransactions } from '../components/dashboard/RecentTransactions'
+import { SpendChart } from '../components/dashboard/SpendChart'
+import { SummaryCards } from '../components/dashboard/SummaryCards'
+import {
+  DEFAULT_MONTH_INDEX,
+  goals,
+  monthlyHistory,
+  transactions,
+} from '../data/mockData'
+import { getPeriodTx, periodLabel, usePeriod } from '../lib/period'
+import { ACCENT } from '../lib/theme'
 
 export function Dashboard() {
-  return <PlaceholderCard fase="Fase 4" />
+  const period = usePeriod(DEFAULT_MONTH_INDEX)
+
+  const periodTx = useMemo(
+    () =>
+      getPeriodTx(
+        transactions,
+        period.periodMode,
+        period.monthIndex,
+        period.customStart,
+        period.customEnd,
+      ),
+    [period.periodMode, period.monthIndex, period.customStart, period.customEnd],
+  )
+
+  const income = periodTx
+    .filter((t) => t.type === 'receita')
+    .reduce((sum, t) => sum + t.amount, 0)
+  const expense = periodTx
+    .filter((t) => t.type === 'despesa')
+    .reduce((sum, t) => sum + t.amount, 0)
+  const invested = periodTx
+    .filter((t) => t.type === 'investimento')
+    .reduce((sum, t) => sum + t.amount, 0)
+  const balance = income - expense
+
+  const catSpend = useMemo(() => {
+    const spend: Record<string, number> = {}
+    periodTx
+      .filter((t) => t.type === 'despesa')
+      .forEach((t) => {
+        spend[t.categoria] = (spend[t.categoria] ?? 0) + t.amount
+      })
+    return spend
+  }, [periodTx])
+
+  const recentTx = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.month === period.monthIndex)
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 5),
+    [period.monthIndex],
+  )
+
+  const label = periodLabel(
+    period.periodMode,
+    period.monthIndex,
+    period.customStart,
+    period.customEnd,
+  )
+
+  return (
+    <div className="flex flex-col gap-5">
+      <PeriodBar
+        monthIndex={period.monthIndex}
+        onPrevMonth={() => period.setMonthIndex((m) => Math.max(0, m - 1))}
+        onNextMonth={() => period.setMonthIndex((m) => Math.min(11, m + 1))}
+        periodMode={period.periodMode}
+        onPeriodModeChange={period.setPeriodMode}
+        customStart={period.customStart}
+        onCustomStartChange={period.setCustomStart}
+        customEnd={period.customEnd}
+        onCustomEndChange={period.setCustomEnd}
+      />
+
+      <SummaryCards
+        balance={balance}
+        income={income}
+        expense={expense}
+        invested={invested}
+        periodLabel={label}
+      />
+
+      <div className="grid grid-cols-[1.6fr_1fr] items-start gap-[18px]">
+        <SpendChart
+          monthlyHistory={monthlyHistory}
+          monthIndex={period.monthIndex}
+          accent={ACCENT}
+        />
+        <CategoryBars catSpend={catSpend} />
+      </div>
+
+      <div className="grid grid-cols-[1.3fr_1fr] items-start gap-[18px]">
+        <RecentTransactions transactions={recentTx} />
+        <GoalsInFocus goals={goals} />
+      </div>
+
+      <InvestmentsList transactions={periodTx} />
+    </div>
+  )
 }
