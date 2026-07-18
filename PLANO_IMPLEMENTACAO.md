@@ -53,8 +53,8 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo). Conectar ao Supabase fica para quando a Fase 1 (modelagem) for feita.
 
 ## Fase 5 — Extrato mensal
-- [ ] Barra de período + filtro por pessoa (pills: Todos/Ana/Marcos)
-- [ ] Lista de transações (ícone circular por categoria, status: pago/pendente/recebido/a receber/aplicado/a aplicar)
+- [x] Barra de período + filtro por pessoa (pills: Todos/Ana/Marcos)
+- [x] Lista de transações (ícone circular por categoria, status: pago/pendente/recebido/a receber/aplicado/a aplicar)
 
 ## Fase 6 — Categorias
 - [ ] Grid de cards (ícone, status dentro/acima do orçamento, barra de progresso — vermelha se estourou)
