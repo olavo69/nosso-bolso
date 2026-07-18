@@ -14,10 +14,10 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 ---
 
 ## Fase 0 — Setup do projeto
-- [ ] Criar repositório Git
-- [ ] Scaffold Vite + React 19 + TypeScript
-- [ ] Instalar e configurar Tailwind (cores, fontes Nunito/Inter, radius conforme tokens)
-- [ ] Instalar libs de apoio (lista acima)
+- [x] Criar repositório Git
+- [x] Scaffold Vite + React 19 + TypeScript
+- [x] Instalar e configurar Tailwind (cores, fontes Nunito/Inter, radius conforme tokens)
+- [x] Instalar libs de apoio (lista acima)
 - [ ] Criar projeto no Supabase
 - [ ] Conectar repo ao Cloudflare Pages (build command, preview deploys automáticos por PR)
 

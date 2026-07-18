@@ -11,8 +11,18 @@
   --color-text-secondary: #7a7c73;
   --color-text-muted: #9a9c91;
   --color-sidebar: #1b1f1c;
+  --color-sidebar-card: #25291f;
+  --color-sidebar-card-border: #33372b;
+  --color-sidebar-text-inactive: #c9c6ba;
+  --color-sidebar-dot-inactive: #5b5f58;
+  --color-sidebar-hint: #c9c6ba;
+
+  --color-topbar-bg: #fbfaf6;
+  --color-pill-bg: #efebe0;
+  --color-row-border: #f0ede3;
 
   --color-accent: #2ecc71;
+  --color-accent-ink: #12160f;
   --color-receita: #1f9d57;
   --color-despesa: #c2492f;
   --color-investimento: #2e7dbf;
@@ -35,4 +45,28 @@ h2,
 h3,
 .font-heading {
   font-family: var(--font-heading);
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.view-transition {
+  animation: fadeSlideUp 0.4s ease both;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dcd5c4;
+  border-radius: 8px;
 }
