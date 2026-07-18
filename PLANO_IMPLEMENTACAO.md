@@ -65,11 +65,11 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [x] Card tracejado "+ Nova meta"
 
 ## Fase 8 — Modal "Nova transação"
-- [ ] Abas Receita / Despesa / Investimento (categorias mudam por aba)
-- [ ] Formulário com React Hook Form + Zod (Valor, Categoria, Data, Quem, Descrição, Status, Repetição)
-- [ ] Lógica de parcelamento (divide valor por N, cria N transações rotuladas "(i/N)", 1ª com status escolhido, demais pendentes)
-- [ ] Lógica de recorrência (12 lançamentos mensais com mesmo valor)
-- [ ] Persistência no Supabase
+- [x] Abas Receita / Despesa / Investimento (categorias mudam por aba)
+- [x] Formulário (Valor, Categoria, Data, Quem, Descrição, Status, Repetição) — usando `useState` simples em vez de React Hook Form + Zod (formulário pequeno e sem validação complexa; reavaliar se crescer)
+- [x] Lógica de parcelamento (divide valor por N, cria N transações rotuladas "(i/N)", 1ª com status escolhido, demais pendentes)
+- [x] Lógica de recorrência (12 lançamentos mensais com mesmo valor)
+- [ ] Persistência no Supabase — por enquanto guardado em `TransactionsContext` (estado React em memória, some ao recarregar a página)
 
 ## Fase 9 — Chat com IA
 - [ ] Edge Function no Supabase como proxy para o OpenRouter (esconde a API key)
