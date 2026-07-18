@@ -34,7 +34,7 @@ export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartPro
   const linePoints = points.map((p) => `${p.x},${p.y}`).join(' ')
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-card border border-border bg-surface p-[22px_24px]">
+    <div className="flex h-full flex-col gap-3.5 rounded-card border border-border bg-surface p-[22px_24px]">
       <div className="flex items-center justify-between">
         <div className="font-heading text-[15px] font-bold">
           Gastos e economia mês a mês
@@ -55,8 +55,8 @@ export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartPro
       </div>
 
       <div
-        className="relative flex items-end gap-3.5 pt-2"
-        style={{ height: CHART_HEIGHT }}
+        className="relative flex flex-1 items-end gap-3.5 pt-2"
+        style={{ minHeight: CHART_HEIGHT }}
       >
         {spendChart.map((b) => (
           <div
