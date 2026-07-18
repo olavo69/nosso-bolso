@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { monthsShort, type MonthlyHistory } from '../../data/mockData'
 import { fmt } from '../../lib/format'
 
@@ -10,26 +11,26 @@ type SpendChartProps = {
 }
 
 export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartProps) {
+  const [hoveredMonth, setHoveredMonth] = useState<number | null>(null)
+
   const maxExpense = Math.max(...monthlyHistory.map((m) => m.expense))
   const spendChart = monthlyHistory.map((m) => ({
     month: m.month,
     label: monthsShort[m.month],
-    valueDisplay: fmt(m.expense),
+    income: m.income,
+    expense: m.expense,
+    savings: m.income - m.expense,
     heightPct: Math.max(4, (m.expense / maxExpense) * 100),
     isCurrent: m.month === monthIndex,
   }))
 
-  const savingsSeries = monthlyHistory.map((m) => ({
-    month: m.month,
-    savings: m.income - m.expense,
-  }))
-  const maxSavings = Math.max(...savingsSeries.map((m) => Math.abs(m.savings)), 1)
-  const n = savingsSeries.length
-  const points = savingsSeries.map((m, i) => {
+  const maxSavings = Math.max(...spendChart.map((m) => Math.abs(m.savings)), 1)
+  const n = spendChart.length
+  const points = spendChart.map((m, i) => {
     const x = ((i + 0.5) / n) * 600
     const y =
       CHART_HEIGHT - (Math.abs(m.savings) / maxSavings) * (CHART_HEIGHT - 20) - 10
-    return { x, y }
+    return { x, y, month: m.month }
   })
   const linePoints = points.map((p) => `${p.x},${p.y}`).join(' ')
 
@@ -58,12 +59,35 @@ export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartPro
         className="relative flex flex-1 items-end gap-3.5 pt-2"
         style={{ minHeight: CHART_HEIGHT }}
       >
-        {spendChart.map((b) => (
+        {spendChart.map((b, i) => (
           <div
             key={b.month}
-            className="flex h-full flex-1 flex-col items-center gap-1.5"
-            title={b.valueDisplay}
+            className="relative flex h-full flex-1 flex-col items-center gap-1.5"
+            onMouseEnter={() => setHoveredMonth(b.month)}
+            onMouseLeave={() => setHoveredMonth(null)}
           >
+            {hoveredMonth === b.month && (
+              <div
+                className={`absolute bottom-full z-20 mb-2 w-max rounded-[10px] border border-sidebar-card-border bg-sidebar px-3 py-2 text-xs text-bg ${
+                  i === 0
+                    ? 'left-0'
+                    : i === spendChart.length - 1
+                      ? 'right-0'
+                      : 'left-1/2 -translate-x-1/2'
+                }`}
+              >
+                <div className="font-heading font-bold">{b.label}</div>
+                <div className="mt-1 flex items-center gap-1.5 text-receita">
+                  <span className="h-1.5 w-1.5 rounded-full bg-receita" />
+                  Receitas: {fmt(b.income)}
+                </div>
+                <div className="mt-0.5 flex items-center gap-1.5 text-despesa">
+                  <span className="h-1.5 w-1.5 rounded-full bg-despesa" />
+                  Despesas: {fmt(b.expense)}
+                </div>
+              </div>
+            )}
+
             <div className="flex w-full flex-1 items-end">
               <div
                 className="w-full rounded-t-[8px] rounded-b-[3px] transition-[height] duration-500 ease-out"
@@ -92,8 +116,15 @@ export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartPro
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          {points.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={4} fill={accent} />
+          {points.map((p) => (
+            <circle
+              key={p.month}
+              cx={p.x}
+              cy={p.y}
+              r={hoveredMonth === p.month ? 5.5 : 4}
+              fill={accent}
+              className="transition-[r] duration-150"
+            />
           ))}
         </svg>
       </div>
