@@ -11,9 +11,10 @@ import {
 
 type RecentTransactionsProps = {
   transactions: Transaction[]
+  onEdit: (transaction: Transaction) => void
 }
 
-export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+export function RecentTransactions({ transactions, onEdit }: RecentTransactionsProps) {
   const navigate = useNavigate()
 
   return (
@@ -35,9 +36,12 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
         const hue = hues[tx.categoria] ?? 0
 
         return (
-          <div
+          <button
             key={tx.id}
-            className="flex items-center gap-3 border-t border-row-border py-2.5"
+            type="button"
+            onClick={() => onEdit(tx)}
+            title="Clique para editar"
+            className="flex w-full items-center gap-3 border-t border-row-border py-2.5 text-left transition-colors hover:bg-bg"
           >
             <div
               className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] text-[13px] font-bold"
@@ -57,7 +61,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             >
               {amountDisplay(tx.type, tx.amount)}
             </div>
-          </div>
+          </button>
         )
       })}
     </div>

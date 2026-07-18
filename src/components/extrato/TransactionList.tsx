@@ -11,9 +11,10 @@ import {
 
 type TransactionListProps = {
   transactions: Transaction[]
+  onEdit: (transaction: Transaction) => void
 }
 
-export function TransactionList({ transactions }: TransactionListProps) {
+export function TransactionList({ transactions, onEdit }: TransactionListProps) {
   if (transactions.length === 0) {
     return (
       <div className="rounded-card border border-border bg-surface px-6 py-10 text-center text-[13.5px] text-text-muted">
@@ -28,9 +29,12 @@ export function TransactionList({ transactions }: TransactionListProps) {
         const hue = hues[tx.categoria] ?? 0
 
         return (
-          <div
+          <button
             key={tx.id}
-            className="flex items-center gap-3.5 border-b border-row-border py-3.5 last:border-b-0"
+            type="button"
+            onClick={() => onEdit(tx)}
+            title="Clique para editar"
+            className="flex w-full items-center gap-3.5 border-b border-row-border py-3.5 text-left transition-colors last:border-b-0 hover:bg-bg"
           >
             <div
               className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] text-[13px] font-bold"
@@ -58,7 +62,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
                 {tx.status ?? 'pago'}
               </div>
             </div>
-          </div>
+          </button>
         )
       })}
     </div>

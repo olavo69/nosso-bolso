@@ -3,9 +3,10 @@ import { colorFor, fmt, pessoaLabel, tintFor } from '../../lib/format'
 
 type InvestmentsListProps = {
   transactions: Transaction[]
+  onEdit: (transaction: Transaction) => void
 }
 
-export function InvestmentsList({ transactions }: InvestmentsListProps) {
+export function InvestmentsList({ transactions, onEdit }: InvestmentsListProps) {
   const investmentRows = transactions.filter((t) => t.type === 'investimento')
 
   return (
@@ -28,9 +29,12 @@ export function InvestmentsList({ transactions }: InvestmentsListProps) {
             : 'var(--color-investimento)'
 
         return (
-          <div
+          <button
             key={tx.id}
-            className="flex items-center gap-3 border-t border-row-border py-2.5"
+            type="button"
+            onClick={() => onEdit(tx)}
+            title="Clique para editar"
+            className="flex w-full items-center gap-3 border-t border-row-border py-2.5 text-left transition-colors hover:bg-bg"
           >
             <div
               className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] text-xs font-bold"
@@ -55,7 +59,7 @@ export function InvestmentsList({ transactions }: InvestmentsListProps) {
                 {tx.status}
               </div>
             </div>
-          </div>
+          </button>
         )
       })}
     </div>

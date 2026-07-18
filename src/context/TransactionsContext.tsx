@@ -4,6 +4,7 @@ import { transactions as initialTransactions, type Transaction } from '../data/m
 type TransactionsContextValue = {
   transactions: Transaction[]
   addTransactions: (newTxs: Omit<Transaction, 'id'>[]) => void
+  updateTransaction: (id: number, updates: Partial<Omit<Transaction, 'id'>>) => void
 }
 
 const TransactionsContext = createContext<TransactionsContextValue | null>(null)
@@ -18,8 +19,17 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  const updateTransaction = (
+    id: number,
+    updates: Partial<Omit<Transaction, 'id'>>,
+  ) => {
+    setTransactions((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+    )
+  }
+
   const value = useMemo(
-    () => ({ transactions, addTransactions }),
+    () => ({ transactions, addTransactions, updateTransaction }),
     [transactions],
   )
 

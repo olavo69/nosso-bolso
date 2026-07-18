@@ -37,6 +37,21 @@ function defaultForm(type: TransactionType): FormState {
   }
 }
 
+const paidStatuses = ['pago', 'recebido', 'aplicado']
+
+function formFromTransaction(tx: Transaction): FormState {
+  return {
+    valor: String(tx.amount),
+    categoria: tx.categoria,
+    data: tx.date,
+    descricao: tx.descricao,
+    pessoa: tx.pessoa,
+    pago: tx.status === undefined || paidStatuses.includes(tx.status),
+    repeticao: 'unica',
+    parcelas: 2,
+  }
+}
+
 const tabs: { key: TransactionType; label: string; activeColor: string }[] = [
   { key: 'receita', label: 'Receita', activeColor: 'var(--color-receita)' },
   { key: 'despesa', label: 'Despesa', activeColor: 'var(--color-despesa)' },
@@ -57,27 +72,35 @@ const repeticaoOptions: { key: RepeticaoKey; label: string }[] = [
 
 type NewTransactionModalProps = {
   open: boolean
-  initialType: TransactionType
+  editing: Transaction | null
+  defaultType: TransactionType
   onClose: () => void
 }
 
 export function NewTransactionModal({
   open,
-  initialType,
+  editing,
+  defaultType,
   onClose,
 }: NewTransactionModalProps) {
-  const { addTransactions } = useTransactions()
-  const [modalType, setModalType] = useState<TransactionType>(initialType)
-  const [form, setForm] = useState<FormState>(() => defaultForm(initialType))
+  const { addTransactions, updateTransaction } = useTransactions()
+  const [modalType, setModalType] = useState<TransactionType>(defaultType)
+  const [form, setForm] = useState<FormState>(() => defaultForm(defaultType))
 
   useEffect(() => {
-    if (open) {
-      setModalType(initialType)
-      setForm(defaultForm(initialType))
+    if (!open) return
+    if (editing) {
+      setModalType(editing.type)
+      setForm(formFromTransaction(editing))
+    } else {
+      setModalType(defaultType)
+      setForm(defaultForm(defaultType))
     }
-  }, [open, initialType])
+  }, [open, editing, defaultType])
 
   if (!open) return null
+
+  const isEditing = editing !== null
 
   function changeTab(type: TransactionType) {
     setModalType(type)
@@ -105,6 +128,23 @@ export function NewTransactionModal({
         : modalType === 'investimento'
           ? 'a aplicar'
           : 'pendente'
+
+    if (isEditing && editing) {
+      const [, m0] = form.data.split('-').map(Number)
+      updateTransaction(editing.id, {
+        month: m0 - 1,
+        date: form.data,
+        descricao: baseDesc,
+        categoria: form.categoria,
+        pessoa: form.pessoa,
+        type: modalType,
+        amount: valorTotal,
+        status,
+      })
+      onClose()
+      return
+    }
+
     const pendingStatus =
       modalType === 'receita' ? 'a receber' : modalType === 'investimento' ? 'a aplicar' : 'pendente'
 
@@ -145,7 +185,7 @@ export function NewTransactionModal({
       >
         <div className="flex items-center justify-between">
           <div className="font-heading text-[17px] font-extrabold">
-            Nova transação
+            {isEditing ? 'Editar transação' : 'Nova transação'}
           </div>
           <button
             type="button"
@@ -267,51 +307,53 @@ export function NewTransactionModal({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <div className="text-xs font-semibold text-text-secondary">
-            Repetição
-          </div>
-          <div className="flex rounded-control bg-[#F0EDE3] p-1">
-            {repeticaoOptions.map((r) => (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, repeticao: r.key }))}
-                className={`flex-1 rounded-[9px] py-2.5 text-center text-[12.5px] font-bold ${
-                  form.repeticao === r.key ? 'bg-text text-bg' : 'text-[#5B5F58]'
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
+        {!isEditing && (
+          <div className="flex flex-col gap-1.5">
+            <div className="text-xs font-semibold text-text-secondary">
+              Repetição
+            </div>
+            <div className="flex rounded-control bg-[#F0EDE3] p-1">
+              {repeticaoOptions.map((r) => (
+                <button
+                  key={r.key}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, repeticao: r.key }))}
+                  className={`flex-1 rounded-[9px] py-2.5 text-center text-[12.5px] font-bold ${
+                    form.repeticao === r.key ? 'bg-text text-bg' : 'text-[#5B5F58]'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
 
-          {form.repeticao === 'parcelada' && (
-            <div className="mt-1 flex items-center gap-2.5">
-              <div className="text-[12.5px] text-text-secondary">
-                Número de parcelas
+            {form.repeticao === 'parcelada' && (
+              <div className="mt-1 flex items-center gap-2.5">
+                <div className="text-[12.5px] text-text-secondary">
+                  Número de parcelas
+                </div>
+                <input
+                  type="number"
+                  min={2}
+                  value={form.parcelas}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      parcelas: Math.max(2, parseInt(e.target.value, 10) || 2),
+                    }))
+                  }
+                  className="w-[70px] rounded-[10px] border border-border px-2.5 py-2 text-[13px] outline-none"
+                />
               </div>
-              <input
-                type="number"
-                min={2}
-                value={form.parcelas}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    parcelas: Math.max(2, parseInt(e.target.value, 10) || 2),
-                  }))
-                }
-                className="w-[70px] rounded-[10px] border border-border px-2.5 py-2 text-[13px] outline-none"
-              />
-            </div>
-          )}
+            )}
 
-          {form.repeticao === 'recorrente' && (
-            <div className="mt-1 text-xs text-text-muted">
-              Será lançada automaticamente todo mês, como um aluguel ou assinatura.
-            </div>
-          )}
-        </div>
+            {form.repeticao === 'recorrente' && (
+              <div className="mt-1 text-xs text-text-muted">
+                Será lançada automaticamente todo mês, como um aluguel ou assinatura.
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-1.5 flex gap-2.5">
           <button

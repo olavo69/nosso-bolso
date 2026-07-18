@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react'
+import { useOutletContext } from 'react-router'
 import { PeriodBar } from '../components/PeriodBar'
 import { PersonFilter } from '../components/extrato/PersonFilter'
 import { TransactionList } from '../components/extrato/TransactionList'
 import { DEFAULT_MONTH_INDEX, type Pessoa } from '../data/mockData'
 import { useTransactions } from '../context/TransactionsContext'
+import type { AppOutletContext } from '../layouts/AppLayout'
 import { getPeriodTx, usePeriod } from '../lib/period'
 
 export function Extrato() {
   const { transactions } = useTransactions()
+  const { openEditModal } = useOutletContext<AppOutletContext>()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
   const [personFilter, setPersonFilter] = useState<'todos' | Pessoa>('todos')
 
@@ -49,7 +52,7 @@ export function Extrato() {
         <PersonFilter value={personFilter} onChange={setPersonFilter} />
       </div>
 
-      <TransactionList transactions={monthTx} />
+      <TransactionList transactions={monthTx} onEdit={openEditModal} />
     </div>
   )
 }

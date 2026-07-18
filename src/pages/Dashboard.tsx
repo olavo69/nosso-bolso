@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useOutletContext } from 'react-router'
 import { CategoryBars } from '../components/dashboard/CategoryBars'
 import { GoalsInFocus } from '../components/dashboard/GoalsInFocus'
 import { InvestmentsList } from '../components/dashboard/InvestmentsList'
@@ -8,11 +9,13 @@ import { SpendChart } from '../components/dashboard/SpendChart'
 import { SummaryCards } from '../components/dashboard/SummaryCards'
 import { DEFAULT_MONTH_INDEX, goals, monthlyHistory } from '../data/mockData'
 import { useTransactions } from '../context/TransactionsContext'
+import type { AppOutletContext } from '../layouts/AppLayout'
 import { getPeriodTx, periodLabel, usePeriod } from '../lib/period'
 import { ACCENT } from '../lib/theme'
 
 export function Dashboard() {
   const { transactions } = useTransactions()
+  const { openEditModal } = useOutletContext<AppOutletContext>()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
 
   const periodTx = useMemo(
@@ -96,11 +99,11 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-[1.3fr_1fr] items-start gap-[18px]">
-        <RecentTransactions transactions={recentTx} />
+        <RecentTransactions transactions={recentTx} onEdit={openEditModal} />
         <GoalsInFocus goals={goals} />
       </div>
 
-      <InvestmentsList transactions={periodTx} />
+      <InvestmentsList transactions={periodTx} onEdit={openEditModal} />
     </div>
   )
 }
