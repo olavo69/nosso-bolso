@@ -43,12 +43,14 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 - [x] Tokens de design no Tailwind config (cores, radius 12–22px, sem sombras pesadas)
 
 ## Fase 4 — Dashboard
-- [ ] Barra de período (Mês/Trimestre/Ano/Personalizado) + lógica de cálculo dos totais
-- [ ] 4 cards de resumo (Saldo, Receitas, Despesas, Investido) com animação de contagem (0 → valor, ease-out cúbico, 700ms)
-- [ ] Gráfico "gastos e economia mês a mês" (barras + linha sobreposta)
-- [ ] Gráfico "por categoria" (barras horizontais, top 5)
-- [ ] Card "Transações recentes" (últimas 5)
-- [ ] "Metas em foco" (top 2) + "Investimentos do mês"
+- [x] Barra de período (Mês/Trimestre/Ano/Personalizado) + lógica de cálculo dos totais
+- [x] 4 cards de resumo (Saldo, Receitas, Despesas, Investido) com animação de contagem (0 → valor, ease-out cúbico, 700ms)
+- [x] Gráfico "gastos e economia mês a mês" (barras + linha sobreposta)
+- [x] Gráfico "por categoria" (barras horizontais, top 5)
+- [x] Card "Transações recentes" (últimas 5)
+- [x] "Metas em foco" (top 2) + "Investimentos do mês"
+
+Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo). Conectar ao Supabase fica para quando a Fase 1 (modelagem) for feita.
 
 ## Fase 5 — Extrato mensal
 - [ ] Barra de período + filtro por pessoa (pills: Todos/Ana/Marcos)
