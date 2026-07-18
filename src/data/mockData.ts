@@ -11,6 +11,7 @@ export type Transaction = {
   type: TransactionType
   amount: number
   status?: string
+  recorrente?: boolean
 }
 
 export type Goal = {

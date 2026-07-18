@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import { Sidebar } from '../components/Sidebar'
 import { Topbar } from '../components/Topbar'
+import { NewTransactionModal } from '../components/modal/NewTransactionModal'
 
 export function AppLayout() {
   const [coupleMode, setCoupleMode] = useState(true)
+  const [modalOpen, setModalOpen] = useState(false)
   const { pathname } = useLocation()
 
   return (
@@ -15,9 +17,7 @@ export function AppLayout() {
         <Topbar
           coupleMode={coupleMode}
           onToggleCouple={setCoupleMode}
-          onNewTransaction={() => {
-            // TODO(Fase 8): abrir modal "Nova transação"
-          }}
+          onNewTransaction={() => setModalOpen(true)}
         />
 
         <main
@@ -27,6 +27,12 @@ export function AppLayout() {
           <Outlet context={{ coupleMode }} />
         </main>
       </div>
+
+      <NewTransactionModal
+        open={modalOpen}
+        initialType="despesa"
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   )
 }

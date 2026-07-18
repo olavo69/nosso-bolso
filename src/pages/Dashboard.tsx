@@ -6,16 +6,13 @@ import { PeriodBar } from '../components/PeriodBar'
 import { RecentTransactions } from '../components/dashboard/RecentTransactions'
 import { SpendChart } from '../components/dashboard/SpendChart'
 import { SummaryCards } from '../components/dashboard/SummaryCards'
-import {
-  DEFAULT_MONTH_INDEX,
-  goals,
-  monthlyHistory,
-  transactions,
-} from '../data/mockData'
+import { DEFAULT_MONTH_INDEX, goals, monthlyHistory } from '../data/mockData'
+import { useTransactions } from '../context/TransactionsContext'
 import { getPeriodTx, periodLabel, usePeriod } from '../lib/period'
 import { ACCENT } from '../lib/theme'
 
 export function Dashboard() {
+  const { transactions } = useTransactions()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
 
   const periodTx = useMemo(
@@ -27,7 +24,7 @@ export function Dashboard() {
         period.customStart,
         period.customEnd,
       ),
-    [period.periodMode, period.monthIndex, period.customStart, period.customEnd],
+    [transactions, period.periodMode, period.monthIndex, period.customStart, period.customEnd],
   )
 
   const income = periodTx
@@ -57,7 +54,7 @@ export function Dashboard() {
         .filter((t) => t.month === period.monthIndex)
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 5),
-    [period.monthIndex],
+    [transactions, period.monthIndex],
   )
 
   const label = periodLabel(

@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 import { PeriodBar } from '../components/PeriodBar'
 import { PersonFilter } from '../components/extrato/PersonFilter'
 import { TransactionList } from '../components/extrato/TransactionList'
-import { DEFAULT_MONTH_INDEX, transactions, type Pessoa } from '../data/mockData'
+import { DEFAULT_MONTH_INDEX, type Pessoa } from '../data/mockData'
+import { useTransactions } from '../context/TransactionsContext'
 import { getPeriodTx, usePeriod } from '../lib/period'
 
 export function Extrato() {
+  const { transactions } = useTransactions()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
   const [personFilter, setPersonFilter] = useState<'todos' | Pessoa>('todos')
 
@@ -21,6 +23,7 @@ export function Extrato() {
       .filter((t) => personFilter === 'todos' || t.pessoa === personFilter)
       .sort((a, b) => b.date.localeCompare(a.date))
   }, [
+    transactions,
     period.periodMode,
     period.monthIndex,
     period.customStart,

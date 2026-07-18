@@ -1,8 +1,11 @@
 import { useMemo } from 'react'
 import { CategoryCard } from '../components/categorias/CategoryCard'
-import { budgets, DEFAULT_MONTH_INDEX, hues, transactions } from '../data/mockData'
+import { budgets, DEFAULT_MONTH_INDEX, hues } from '../data/mockData'
+import { useTransactions } from '../context/TransactionsContext'
 
 export function Categorias() {
+  const { transactions } = useTransactions()
+
   const catSpend = useMemo(() => {
     const spend: Record<string, number> = {}
     transactions
@@ -11,7 +14,7 @@ export function Categorias() {
         spend[t.categoria] = (spend[t.categoria] ?? 0) + t.amount
       })
     return spend
-  }, [])
+  }, [transactions])
 
   return (
     <div className="grid grid-cols-3 gap-[18px]">
