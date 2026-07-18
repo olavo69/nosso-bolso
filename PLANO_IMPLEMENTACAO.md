@@ -18,7 +18,7 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 - [x] Scaffold Vite + React 19 + TypeScript
 - [x] Instalar e configurar Tailwind (cores, fontes Nunito/Inter, radius conforme tokens)
 - [x] Instalar libs de apoio (lista acima)
-- [ ] Criar projeto no Supabase
+- [x] Criar projeto no Supabase (`nosso-bolso`, ref `uzmicducyxwkbbddlkxl`) — feito na Fase 9, sob demanda
 - [ ] Conectar repo ao Cloudflare Pages (build command, preview deploys automáticos por PR)
 
 ## Fase 1 — Modelagem de dados (Supabase)
@@ -73,9 +73,11 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [x] Editar transação existente — gap do design original (não tinha essa opção); clicar numa linha no Extrato, Dashboard ou Investimentos abre o mesmo modal preenchido, sem a seção Repetição
 
 ## Fase 9 — Chat com IA
-- [ ] Edge Function no Supabase como proxy para o OpenRouter (esconde a API key)
-- [ ] UI de chat (bolhas usuário/bot, chips de sugestão, indicador "digitando…")
-- [ ] Contexto financeiro do usuário incluído no prompt (transações, categorias, metas)
+- [x] Edge Function no Supabase como proxy para o OpenRouter (esconde a API key) — deployada em `nosso-bolso` (ref `uzmicducyxwkbbddlkxl`)
+- [x] UI de chat (bolhas usuário/bot, chips de sugestão, indicador "digitando…")
+- [x] Contexto financeiro do usuário incluído no prompt (transações, categorias, metas)
+
+Modelo em uso: `openai/gpt-oss-20b:free` (gratuito, testado e estável — outros modelos `:free` testados deram rate limit ou foram descontinuados). Trocar em `supabase/functions/chat/index.ts` (`MODEL`) se quiser algo mais robusto depois de adicionar crédito no OpenRouter.
 
 ## Fase 10 — Perfil
 - [x] Card de perfil (avatar, nome, e-mail) + card do parceiro vinculado
