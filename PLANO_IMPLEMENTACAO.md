@@ -70,6 +70,7 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [x] Lógica de parcelamento (divide valor por N, cria N transações rotuladas "(i/N)", 1ª com status escolhido, demais pendentes)
 - [x] Lógica de recorrência (12 lançamentos mensais com mesmo valor)
 - [ ] Persistência no Supabase — por enquanto guardado em `TransactionsContext` (estado React em memória, some ao recarregar a página)
+- [x] Editar transação existente — gap do design original (não tinha essa opção); clicar numa linha no Extrato, Dashboard ou Investimentos abre o mesmo modal preenchido, sem a seção Repetição
 
 ## Fase 9 — Chat com IA
 - [ ] Edge Function no Supabase como proxy para o OpenRouter (esconde a API key)
