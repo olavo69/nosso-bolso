@@ -4,7 +4,7 @@ import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
 
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
-const MODEL = "anthropic/claude-3.5-haiku";
+const MODEL = "openai/gpt-oss-20b:free";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,6 +37,7 @@ const handler = withSupabase(
     const systemPrompt = [
       "Você é a assistente financeira do Nosso Bolso, um app de finanças para casais.",
       "Responda em português do Brasil, de forma breve, prática e amigável.",
+      "Escreva sempre em texto corrido, como numa conversa de chat — nunca use tabelas, listas markdown, negrito com asteriscos ou qualquer outra formatação markdown, pois o app exibe só texto simples.",
       "Baseie suas respostas nos dados financeiros reais do casal fornecidos abaixo.",
       "Se a pergunta não puder ser respondida com esses dados, seja honesta sobre isso.",
       "",
