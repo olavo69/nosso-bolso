@@ -37,10 +37,10 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 - [ ] Contexto de auth no React (usuário atual + parceiro vinculado)
 
 ## Fase 3 — Shell da aplicação
-- [ ] Sidebar fixa (232px, `#1B1F1C`, 6 seções)
-- [ ] Topbar (76px): título da tela, toggle Individual/Casal, avatares, botão "+ Nova transação"
-- [ ] Roteamento com transição entre views (fade/slide-up, 0.4s)
-- [ ] Tokens de design no Tailwind config (cores, radius 12–22px, sem sombras pesadas)
+- [x] Sidebar fixa (232px, `#1B1F1C`, 6 seções)
+- [x] Topbar (76px): título da tela, toggle Individual/Casal, avatares, botão "+ Nova transação"
+- [x] Roteamento com transição entre views (fade/slide-up, 0.4s)
+- [x] Tokens de design no Tailwind config (cores, radius 12–22px, sem sombras pesadas)
 
 ## Fase 4 — Dashboard
 - [ ] Barra de período (Mês/Trimestre/Ano/Personalizado) + lógica de cálculo dos totais
