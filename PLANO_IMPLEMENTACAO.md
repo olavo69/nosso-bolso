@@ -57,8 +57,8 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [x] Lista de transações (ícone circular por categoria, status: pago/pendente/recebido/a receber/aplicado/a aplicar)
 
 ## Fase 6 — Categorias
-- [ ] Grid de cards (ícone, status dentro/acima do orçamento, barra de progresso — vermelha se estourou)
-- [ ] Card tracejado "+ Nova categoria"
+- [x] Grid de cards (ícone, status dentro/acima do orçamento, barra de progresso — vermelha se estourou)
+- [x] Card tracejado "+ Nova categoria"
 
 ## Fase 7 — Metas
 - [ ] Grid de cards (nome, prazo, badge %, progresso, guardado/meta)
