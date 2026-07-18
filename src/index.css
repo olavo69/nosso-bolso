@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --font-heading: "Nunito", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-bg: #f6f3ec;
+  --color-surface: #ffffff;
+  --color-border: #e7e2d6;
+  --color-text: #1b1f1c;
+  --color-text-secondary: #7a7c73;
+  --color-text-muted: #9a9c91;
+  --color-sidebar: #1b1f1c;
+
+  --color-accent: #2ecc71;
+  --color-receita: #1f9d57;
+  --color-despesa: #c2492f;
+  --color-investimento: #2e7dbf;
+  --color-pendente: #b8862b;
+
+  --radius-card: 20px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: var(--font-heading);
+}
