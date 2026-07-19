@@ -2,6 +2,8 @@ export type ProfileRow = {
   id: string
   couple_id: string | null
   name: string
+  email: string | null
+  phone: string | null
   currency: string
   plan: string
   created_at: string

@@ -76,9 +76,7 @@ export function Perfil() {
             <div className="font-heading text-[19px] font-extrabold">
               {profile.name}
             </div>
-            <div className="text-[13px] text-text-muted">
-              {profile.currency} · {profile.plan}
-            </div>
+            <div className="text-[13px] text-text-muted">{profile.email}</div>
           </div>
         </div>
 
