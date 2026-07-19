@@ -37,6 +37,9 @@ Migrations em `supabase/migrations/`. Colunas monetárias usam `double precision
 - [x] Tela de login/cadastro (Supabase Auth) — `src/pages/Login.tsx`, sem referência no design original
 - [x] Fluxo de convite/vínculo do parceiro — funções RPC `create_couple()` / `join_couple(code)`, código de 6 caracteres
 - [x] Contexto de auth no React (`AuthContext`: usuário atual + parceiro vinculado)
+- [x] Login com Google (OAuth) — cliente criado no Google Cloud Console (projeto `gseapi`), provider ativado no Supabase. Redirect testado (cai certo na tela do Google); fluxo completo depende de login real do usuário.
+- [x] "Esqueci minha senha" (`resetPasswordForEmail`)
+- [x] Detecção de e-mail já cadastrado no signup (Supabase não retorna erro por padrão; checamos `identities.length === 0`)
 
 Testado de ponta a ponta: 2 contas reais cadastradas, vinculadas via código de convite, dados mockados originais re-inseridos nelas para comparação visual, e uma 3ª conta não vinculada confirmando que o RLS isola os dados corretamente (não vê nada do casal Ana/Marcos).
 
