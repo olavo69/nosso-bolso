@@ -1,5 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
+
+const trustMessages = [
+  'Seus dados ficam só entre vocês dois.',
+  'Metas compartilhadas, sem perder o prazo de vista.',
+  'Orçamento avisa antes de estourar o limite.',
+  'Perguntem pro app sobre os gastos, na hora.',
+]
 
 const features = [
   {
@@ -121,6 +128,32 @@ function Eyebrow({ children, center }: { children: string; center?: boolean }) {
   )
 }
 
+function RotatingTrustLine() {
+  const [index, setIndex] = useState(0)
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const interval = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % trustMessages.length)
+        setVisible(true)
+      }, 300)
+    }, 3200)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="mt-0.5 flex items-center gap-2 text-[13px] text-text-muted">
+      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+      <span className={`transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}>
+        {trustMessages[index]}
+      </span>
+    </div>
+  )
+}
+
 function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   return (
     <div className="rounded-2xl border border-border bg-surface px-6 py-5">
@@ -178,10 +211,7 @@ export function Landing() {
               Já tenho conta
             </Link>
           </div>
-          <div className="mt-0.5 flex items-center gap-2 text-[13px] text-text-muted">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Seus dados ficam só entre vocês dois.
-          </div>
+          <RotatingTrustLine />
         </div>
 
         <div className="rounded-[24px] bg-sidebar p-5 shadow-[0_30px_60px_-25px_rgba(27,31,28,0.35)]">
