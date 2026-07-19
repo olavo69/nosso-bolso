@@ -22,19 +22,27 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 - [ ] Conectar repo ao Cloudflare Pages (build command, preview deploys automáticos por PR)
 
 ## Fase 1 — Modelagem de dados (Supabase)
-- [ ] `profiles` (usuário: nome, avatar, moeda, plano)
-- [ ] `couples` (vincula 2 profiles)
-- [ ] `transactions` (id, couple_id, pessoa, type: receita/despesa/investimento, amount, categoria, data, status, recorrente, info de parcela)
-- [ ] `categories` / `budgets` (por couple, orçamento mensal por categoria)
-- [ ] `goals` (metas de poupança: nome, prazo, valor guardado/meta)
-- [ ] `chat_messages` (histórico do chat com IA, opcional)
-- [ ] Row Level Security: cada usuário só acessa dados do próprio `couple_id`
-- [ ] Seed de categorias padrão (cores via `oklch(55% 0.14 <hue>)`, hues do README)
+- [x] `profiles` (usuário: nome, moeda, plano, `couple_id`)
+- [x] `couples` (`invite_code` único; vincula 2 profiles)
+- [x] `transactions` (id, couple_id, `pessoa_id` nullable, type, amount, categoria, data, status, recorrente, parcela_atual/parcela_total)
+- [x] `categories` (por couple, `tipo` despesa/receita/investimento, hue, budget nullable)
+- [x] `goals` (metas de poupança: nome, prazo, `current_amount`/target, hue)
+- [x] `chat_messages` (histórico do chat com IA — persistido de verdade, não é mais opcional)
+- [x] Row Level Security em todas as tabelas via função `my_couple_id()` (security definer, evita recursão)
+- [x] Seed de categorias padrão via função `seed_default_categories()`, chamada automaticamente em `create_couple()`
+
+Migrations em `supabase/migrations/`. Colunas monetárias usam `double precision` (não `numeric`) — PostgREST devolve `numeric` como string, o que quebraria as contas no front.
 
 ## Fase 2 — Auth & vínculo de casal
-- [ ] Tela de login/cadastro (Supabase Auth)
-- [ ] Fluxo de convite/vínculo do parceiro (gera `couple_id` compartilhado)
-- [ ] Contexto de auth no React (usuário atual + parceiro vinculado)
+- [x] Tela de login/cadastro (Supabase Auth) — `src/pages/Login.tsx`, sem referência no design original
+- [x] Fluxo de convite/vínculo do parceiro — funções RPC `create_couple()` / `join_couple(code)`, código de 6 caracteres
+- [x] Contexto de auth no React (`AuthContext`: usuário atual + parceiro vinculado)
+
+Testado de ponta a ponta: 2 contas reais cadastradas, vinculadas via código de convite, dados mockados originais re-inseridos nelas para comparação visual, e uma 3ª conta não vinculada confirmando que o RLS isola os dados corretamente (não vê nada do casal Ana/Marcos).
+
+`pessoa` deixou de ser `'ana'|'marcos'|'casal'` fixo e virou `pessoa_id` (uuid nullable, `null` = casal) — isso mudou `pessoaLabel`, `PersonFilter`, o seletor "Quem" do modal e os avatares da Topbar, que agora resolvem nome/iniciais reais via `AuthContext`.
+
+Nota: `mailer_autoconfirm` foi ativado no projeto Supabase (via Management API) para não travar contas de teste esperando confirmação por e-mail — reavaliar antes de um lançamento real com usuários de verdade.
 
 ## Fase 3 — Shell da aplicação
 - [x] Sidebar fixa (232px, `#1B1F1C`, 6 seções)
@@ -50,7 +58,7 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 - [x] Card "Transações recentes" (últimas 5)
 - [x] "Metas em foco" (top 2) + "Investimentos do mês"
 
-Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo). Conectar ao Supabase fica para quando a Fase 1 (modelagem) for feita.
+Dados agora vêm do Supabase (Fase 1) via `TransactionsContext`/`CategoriesContext`/`GoalsContext`. `src/data/mockData.ts` ainda existe só para os textos/labels estáticos (meses, hues de referência) e como base do script de seed usado nas contas de teste.
 
 ## Fase 5 — Extrato mensal
 - [x] Barra de período + filtro por pessoa (pills: Todos/Ana/Marcos)
@@ -69,7 +77,7 @@ Dados mockados em `src/data/mockData.ts` (mesmos dados de exemplo do protótipo)
 - [x] Formulário (Valor, Categoria, Data, Quem, Descrição, Status, Repetição) — usando `useState` simples em vez de React Hook Form + Zod (formulário pequeno e sem validação complexa; reavaliar se crescer)
 - [x] Lógica de parcelamento (divide valor por N, cria N transações rotuladas "(i/N)", 1ª com status escolhido, demais pendentes)
 - [x] Lógica de recorrência (12 lançamentos mensais com mesmo valor)
-- [ ] Persistência no Supabase — por enquanto guardado em `TransactionsContext` (estado React em memória, some ao recarregar a página)
+- [x] Persistência no Supabase — `TransactionsContext` lê/grava direto na tabela `transactions`
 - [x] Editar transação existente — gap do design original (não tinha essa opção); clicar numa linha no Extrato, Dashboard ou Investimentos abre o mesmo modal preenchido, sem a seção Repetição
 
 ## Fase 9 — Chat com IA
