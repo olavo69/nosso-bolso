@@ -285,6 +285,42 @@ export function Landing() {
                 </div>
                 <h3 className="m-0 font-heading text-lg font-bold text-bg">{s.title}</h3>
                 <p className="m-0 text-sm leading-relaxed text-sidebar-text-inactive">{s.desc}</p>
+
+                {s.number === 1 && (
+                  <div className="flex flex-col gap-2 rounded-[14px] border border-sidebar-card-border bg-sidebar-card p-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#D9C9A3] text-[10px] font-bold text-text">
+                        AS
+                      </div>
+                      <div className="h-2 flex-1 rounded bg-[#3A3D34]" />
+                    </div>
+                  </div>
+                )}
+
+                {s.number === 2 && (
+                  <div className="flex flex-col gap-2 rounded-[14px] border border-sidebar-card-border bg-sidebar-card p-4">
+                    <div className="flex justify-between text-[11.5px] font-semibold text-bg">
+                      <span>Ana convidou Marcos</span>
+                      <span className="text-accent">aceito</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-pill bg-[#3A3D34]">
+                      <div className="h-full w-full rounded-pill bg-accent" />
+                    </div>
+                  </div>
+                )}
+
+                {s.number === 3 && (
+                  <div className="flex flex-col gap-2 rounded-[14px] border border-sidebar-card-border bg-sidebar-card p-4">
+                    <div className="flex justify-between text-[11.5px] font-semibold text-bg">
+                      <span>Supermercado</span>
+                      <span className="text-[#E88]">- R$ 480</span>
+                    </div>
+                    <div className="flex justify-between text-[11.5px] font-semibold text-bg">
+                      <span>Meta: Viagem Bahia</span>
+                      <span className="text-accent">52%</span>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
