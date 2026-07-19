@@ -63,7 +63,7 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({ transactions, loading, addTransactions, updateTransaction }),
-    [transactions, loading],
+    [transactions, loading, profile?.couple_id],
   )
 
   return (

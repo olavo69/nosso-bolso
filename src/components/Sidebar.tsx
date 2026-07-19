@@ -1,7 +1,10 @@
 import { NavLink } from 'react-router'
 import { navItems } from '../lib/navigation'
+import { useAuth } from '../context/AuthContext'
 
 export function Sidebar() {
+  const { signOut } = useAuth()
+
   return (
     <aside className="flex w-[232px] shrink-0 flex-col gap-7 bg-sidebar p-4 pt-6">
       <div className="flex items-center gap-2.5 px-2">
@@ -39,6 +42,15 @@ export function Sidebar() {
             )}
           </NavLink>
         ))}
+
+        <button
+          type="button"
+          onClick={signOut}
+          className="flex items-center gap-2.5 rounded-control px-3 py-[11px] text-left text-[14.5px] font-semibold text-sidebar-text-inactive transition-colors hover:text-bg"
+        >
+          <span className="h-[7px] w-[7px] rounded-full bg-sidebar-dot-inactive" />
+          Sair
+        </button>
       </nav>
 
       <div className="mt-auto flex flex-col gap-2 rounded-2xl border border-sidebar-card-border bg-sidebar-card p-4">

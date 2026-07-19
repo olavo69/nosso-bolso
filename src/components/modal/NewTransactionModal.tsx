@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useCategories } from '../../context/CategoriesContext'
 import { useTransactions, type NewTransactionInput } from '../../context/TransactionsContext'
+import { NewCategoryModal } from '../categorias/NewCategoryModal'
 import type { TransactionRow } from '../../types/db'
+
+const NEW_CATEGORY_VALUE = '__new__'
 
 type TransactionType = TransactionRow['type']
 
@@ -51,11 +54,14 @@ export function NewTransactionModal({
   const { addTransactions, updateTransaction } = useTransactions()
   const [modalType, setModalType] = useState<TransactionType>(defaultType)
   const [form, setForm] = useState<FormState | null>(null)
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false)
 
   const pessoaOptions = [
-    { key: profile?.id ?? null, label: profile?.name ?? 'Você' },
-    ...(partnerProfile ? [{ key: partnerProfile.id, label: partnerProfile.name }] : []),
-    { key: null, label: 'Casal' },
+    { id: 'self', key: profile?.id ?? null, label: profile?.name ?? 'Você' },
+    ...(partnerProfile
+      ? [{ id: 'partner', key: partnerProfile.id, label: partnerProfile.name }]
+      : []),
+    { id: 'casal', key: null, label: 'Casal' },
   ]
 
   function categoriasFor(type: TransactionType) {
@@ -233,9 +239,13 @@ export function NewTransactionModal({
             </div>
             <select
               value={form.categoria}
-              onChange={(e) =>
+              onChange={(e) => {
+                if (e.target.value === NEW_CATEGORY_VALUE) {
+                  setCategoryModalOpen(true)
+                  return
+                }
                 setForm((f) => (f ? { ...f, categoria: e.target.value } : f))
-              }
+              }}
               className="rounded-control border border-border px-2.5 py-3 text-[13.5px] outline-none"
             >
               {categoriasFor(modalType).map((opt) => (
@@ -243,6 +253,7 @@ export function NewTransactionModal({
                   {opt}
                 </option>
               ))}
+              <option value={NEW_CATEGORY_VALUE}>+ Criar categoria</option>
             </select>
           </div>
           <div className="flex flex-1 flex-col gap-1.5">
@@ -261,7 +272,7 @@ export function NewTransactionModal({
           <div className="flex gap-2">
             {pessoaOptions.map((po) => (
               <button
-                key={po.key ?? 'casal'}
+                key={po.id}
                 type="button"
                 onClick={() => setForm((f) => (f ? { ...f, pessoaId: po.key } : f))}
                 className={`flex-1 rounded-[10px] py-2.5 text-center text-[12.5px] font-semibold ${
@@ -384,6 +395,16 @@ export function NewTransactionModal({
           </button>
         </div>
       </div>
+
+      <NewCategoryModal
+        open={categoryModalOpen}
+        fixedTipo={modalType}
+        onClose={() => setCategoryModalOpen(false)}
+        onCreated={(created) => {
+          setForm((f) => (f ? { ...f, categoria: created.nome } : f))
+          setCategoryModalOpen(false)
+        }}
+      />
     </div>
   )
 }

@@ -9,22 +9,61 @@ export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  function changeMode(newMode: Mode) {
+    setMode(newMode)
+    setError(null)
+    setSuccessMessage(null)
+  }
+
+  async function handleForgotPassword() {
+    if (!supabase) return
+    if (!email) {
+      setError('Digite seu e-mail acima primeiro, depois clique em "Esqueci minha senha".')
+      return
+    }
+    setError(null)
+    setLoading(true)
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email)
+    setLoading(false)
+    if (resetError) {
+      setError(resetError.message)
+      return
+    }
+    setSuccessMessage(`Enviamos um link de redefinição de senha para ${email}.`)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!supabase) return
     setError(null)
+    setSuccessMessage(null)
     setLoading(true)
 
     try {
       if (mode === 'cadastrar') {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: { data: { name } },
         })
         if (signUpError) throw signUpError
+
+        // Supabase não retorna erro para e-mail já cadastrado (evita enumeração);
+        // identities vazio é o sinal de que a conta já existia.
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          setError(
+            'Esse e-mail já está cadastrado. Tente entrar, ou clique em "Esqueci minha senha" na aba Entrar.',
+          )
+          return
+        }
+
+        setSuccessMessage(
+          `Enviamos um e-mail de confirmação para ${email}. Clique no link para ativar sua conta e depois entre por aqui.`,
+        )
+        setPassword('')
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -54,7 +93,7 @@ export function Login() {
         <div className="mb-5 flex rounded-control bg-[#F0EDE3] p-1">
           <button
             type="button"
-            onClick={() => setMode('entrar')}
+            onClick={() => changeMode('entrar')}
             className={`flex-1 rounded-[9px] py-2.5 text-center text-[12.5px] font-bold ${
               mode === 'entrar' ? 'bg-surface text-text' : 'text-text-muted'
             }`}
@@ -63,7 +102,7 @@ export function Login() {
           </button>
           <button
             type="button"
-            onClick={() => setMode('cadastrar')}
+            onClick={() => changeMode('cadastrar')}
             className={`flex-1 rounded-[9px] py-2.5 text-center text-[12.5px] font-bold ${
               mode === 'cadastrar' ? 'bg-surface text-text' : 'text-text-muted'
             }`}
@@ -100,7 +139,18 @@ export function Login() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <div className="text-xs font-semibold text-text-secondary">Senha</div>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-text-secondary">Senha</div>
+              {mode === 'entrar' && (
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-[11px] font-semibold text-accent"
+                >
+                  Esqueci minha senha
+                </button>
+              )}
+            </div>
             <input
               type="password"
               required
@@ -115,6 +165,12 @@ export function Login() {
           {error && (
             <div className="rounded-control bg-[#F7E9E4] px-3.5 py-2.5 text-[12.5px] text-despesa">
               {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="rounded-control bg-[#E8F5EC] px-3.5 py-2.5 text-[12.5px] text-receita">
+              {successMessage}
             </div>
           )}
 
