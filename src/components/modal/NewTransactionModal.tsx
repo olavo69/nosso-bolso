@@ -51,10 +51,12 @@ export function NewTransactionModal({
 }: NewTransactionModalProps) {
   const { profile, partnerProfile } = useAuth()
   const { categories } = useCategories()
-  const { addTransactions, updateTransaction } = useTransactions()
+  const { addTransactions, updateTransaction, deleteTransaction } = useTransactions()
   const [modalType, setModalType] = useState<TransactionType>(defaultType)
   const [form, setForm] = useState<FormState | null>(null)
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const pessoaOptions = [
     { id: 'self', key: profile?.id ?? null, label: profile?.name ?? 'Você' },
@@ -96,6 +98,7 @@ export function NewTransactionModal({
 
   useEffect(() => {
     if (!open) return
+    setConfirmingDelete(false)
     if (editing) {
       setModalType(editing.type)
       setForm(formFromTransaction(editing))
@@ -179,6 +182,21 @@ export function NewTransactionModal({
 
     await addTransactions(newTxs)
     onClose()
+  }
+
+  async function handleDelete() {
+    if (!editing) return
+    if (!confirmingDelete) {
+      setConfirmingDelete(true)
+      return
+    }
+    setDeleting(true)
+    try {
+      await deleteTransaction(editing.id)
+      onClose()
+    } finally {
+      setDeleting(false)
+    }
   }
 
   return (
@@ -376,6 +394,25 @@ export function NewTransactionModal({
               </div>
             )}
           </div>
+        )}
+
+        {isEditing && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className={`rounded-control py-3 text-center text-[13px] font-bold transition-colors disabled:opacity-60 ${
+              confirmingDelete
+                ? 'bg-despesa text-white'
+                : 'border border-despesa/40 text-despesa hover:bg-[#F7E9E4]'
+            }`}
+          >
+            {deleting
+              ? 'Excluindo…'
+              : confirmingDelete
+                ? 'Clique de novo para confirmar a exclusão'
+                : 'Excluir transação'}
+          </button>
         )}
 
         <div className="mt-1.5 flex gap-2.5">

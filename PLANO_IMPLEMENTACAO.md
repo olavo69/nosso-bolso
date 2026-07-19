@@ -82,6 +82,7 @@ Dados agora vêm do Supabase (Fase 1) via `TransactionsContext`/`CategoriesConte
 - [x] Lógica de recorrência (12 lançamentos mensais com mesmo valor)
 - [x] Persistência no Supabase — `TransactionsContext` lê/grava direto na tabela `transactions`
 - [x] Editar transação existente — gap do design original (não tinha essa opção); clicar numa linha no Extrato, Dashboard ou Investimentos abre o mesmo modal preenchido, sem a seção Repetição
+- [x] Excluir transação — botão no modal de edição, com confirmação em 2 cliques ("Excluir transação" → "Clique de novo para confirmar")
 
 ## Fase 9 — Chat com IA
 - [x] Edge Function no Supabase como proxy para o OpenRouter (esconde a API key) — deployada em `nosso-bolso` (ref `uzmicducyxwkbbddlkxl`)
@@ -93,6 +94,7 @@ Modelo em uso: `openai/gpt-oss-20b:free` (gratuito, testado e estável — outro
 ## Fase 10 — Perfil
 - [x] Card de perfil (avatar, nome, e-mail) + card do parceiro vinculado
 - [x] Card "Preferências" (toggles) + card "Conta" (moeda, plano, sair)
+- [x] Resetar todos os dados — gap do design original; botão em "Conta" abre modal que exige confirmar a senha atual (`signInWithPassword`) antes de chamar a função `reset_couple_data()` (apaga transações/metas/categorias do casal e re-semeia as categorias padrão)
 
 ## Fase 11 — Deploy & polish
 - [ ] Deploy de produção no Cloudflare Pages

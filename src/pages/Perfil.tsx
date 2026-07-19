@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Toggle } from '../components/perfil/Toggle'
+import { ResetDataModal } from '../components/perfil/ResetDataModal'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabaseClient'
 import { initials } from '../lib/format'
@@ -21,6 +22,7 @@ export function Perfil() {
   const [joinCodeInput, setJoinCodeInput] = useState('')
   const [linkError, setLinkError] = useState<string | null>(null)
   const [linkLoading, setLinkLoading] = useState(false)
+  const [resetModalOpen, setResetModalOpen] = useState(false)
 
   useEffect(() => {
     async function fetchInviteCode() {
@@ -166,8 +168,17 @@ export function Perfil() {
           >
             Sair da conta
           </button>
+          <button
+            type="button"
+            onClick={() => setResetModalOpen(true)}
+            className="flex justify-between border-t border-row-border py-2 pt-3 text-left font-semibold text-despesa"
+          >
+            Resetar todos os dados
+          </button>
         </div>
       </div>
+
+      <ResetDataModal open={resetModalOpen} onClose={() => setResetModalOpen(false)} />
     </div>
   )
 }

@@ -17,6 +17,7 @@ type TransactionsContextValue = {
   loading: boolean
   addTransactions: (rows: NewTransactionInput[]) => Promise<void>
   updateTransaction: (id: string, updates: Partial<NewTransactionInput>) => Promise<void>
+  deleteTransaction: (id: string) => Promise<void>
 }
 
 const TransactionsContext = createContext<TransactionsContextValue | null>(null)
@@ -61,8 +62,15 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     await refetch()
   }
 
+  async function deleteTransaction(id: string) {
+    if (!supabase) return
+    const { error } = await supabase.from('transactions').delete().eq('id', id)
+    if (error) throw error
+    await refetch()
+  }
+
   const value = useMemo(
-    () => ({ transactions, loading, addTransactions, updateTransaction }),
+    () => ({ transactions, loading, addTransactions, updateTransaction, deleteTransaction }),
     [transactions, loading, profile?.couple_id],
   )
 
