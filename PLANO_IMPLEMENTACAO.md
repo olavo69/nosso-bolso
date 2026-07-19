@@ -42,7 +42,7 @@ Testado de ponta a ponta: 2 contas reais cadastradas, vinculadas via código de 
 
 `pessoa` deixou de ser `'ana'|'marcos'|'casal'` fixo e virou `pessoa_id` (uuid nullable, `null` = casal) — isso mudou `pessoaLabel`, `PersonFilter`, o seletor "Quem" do modal e os avatares da Topbar, que agora resolvem nome/iniciais reais via `AuthContext`.
 
-Nota: `mailer_autoconfirm` foi ativado no projeto Supabase (via Management API) para não travar contas de teste esperando confirmação por e-mail — reavaliar antes de um lançamento real com usuários de verdade.
+Nota: `mailer_autoconfirm` foi ativado temporariamente durante os testes (contas de teste sem confirmação por e-mail) e reativado (`false`) em seguida — cadastros agora exigem confirmação por e-mail antes de entrar. O Supabase usa seu mailer próprio no plano gratuito (limite baixo de envios/hora); configurar SMTP próprio fica como item da Fase 11 se o volume de cadastro exigir.
 
 ## Fase 3 — Shell da aplicação
 - [x] Sidebar fixa (232px, `#1B1F1C`, 6 seções)
