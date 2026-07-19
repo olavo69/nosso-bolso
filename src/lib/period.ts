@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { months, type Transaction } from '../data/mockData'
+import { months } from '../data/mockData'
+import type { TransactionRow } from '../types/db'
 
 export type PeriodMode = 'mes' | 'trimestre' | 'ano' | 'custom'
 
@@ -21,24 +22,28 @@ export function usePeriod(initialMonthIndex: number) {
   }
 }
 
+function monthOf(tx: TransactionRow) {
+  return new Date(`${tx.data}T00:00:00`).getMonth()
+}
+
 export function getPeriodTx(
-  transactions: Transaction[],
+  transactions: TransactionRow[],
   periodMode: PeriodMode,
   monthIndex: number,
   customStart: string,
   customEnd: string,
 ) {
   if (periodMode === 'custom') {
-    return transactions.filter((t) => t.date >= customStart && t.date <= customEnd)
+    return transactions.filter((t) => t.data >= customStart && t.data <= customEnd)
   }
   if (periodMode === 'trimestre') {
     const lo = Math.max(0, monthIndex - 2)
-    return transactions.filter((t) => t.month >= lo && t.month <= monthIndex)
+    return transactions.filter((t) => monthOf(t) >= lo && monthOf(t) <= monthIndex)
   }
   if (periodMode === 'ano') {
-    return transactions.filter((t) => t.date.startsWith('2026'))
+    return transactions.filter((t) => t.data.startsWith('2026'))
   }
-  return transactions.filter((t) => t.month === monthIndex)
+  return transactions.filter((t) => monthOf(t) === monthIndex)
 }
 
 export function periodLabel(

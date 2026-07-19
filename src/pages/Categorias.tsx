@@ -1,15 +1,22 @@
 import { useMemo } from 'react'
 import { CategoryCard } from '../components/categorias/CategoryCard'
-import { budgets, DEFAULT_MONTH_INDEX, hues } from '../data/mockData'
+import { DEFAULT_MONTH_INDEX } from '../data/mockData'
 import { useTransactions } from '../context/TransactionsContext'
+import { useCategories } from '../context/CategoriesContext'
 
 export function Categorias() {
   const { transactions } = useTransactions()
+  const { categories } = useCategories()
+  const despesaCategories = categories.filter((c) => c.tipo === 'despesa')
 
   const catSpend = useMemo(() => {
     const spend: Record<string, number> = {}
     transactions
-      .filter((t) => t.month === DEFAULT_MONTH_INDEX && t.type === 'despesa')
+      .filter(
+        (t) =>
+          new Date(`${t.data}T00:00:00`).getMonth() === DEFAULT_MONTH_INDEX &&
+          t.type === 'despesa',
+      )
       .forEach((t) => {
         spend[t.categoria] = (spend[t.categoria] ?? 0) + t.amount
       })
@@ -18,13 +25,13 @@ export function Categorias() {
 
   return (
     <div className="grid grid-cols-3 gap-[18px]">
-      {Object.keys(budgets).map((nome) => (
+      {despesaCategories.map((cat) => (
         <CategoryCard
-          key={nome}
-          nome={nome}
-          hue={hues[nome] ?? 0}
-          spent={catSpend[nome] ?? 0}
-          budget={budgets[nome]}
+          key={cat.id}
+          nome={cat.nome}
+          hue={cat.hue}
+          spent={catSpend[cat.nome] ?? 0}
+          budget={cat.budget ?? 0}
         />
       ))}
 

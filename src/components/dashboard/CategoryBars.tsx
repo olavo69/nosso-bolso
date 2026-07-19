@@ -1,11 +1,13 @@
-import { hues } from '../../data/mockData'
+import type { CategoryRow } from '../../types/db'
 import { colorFor, fmt } from '../../lib/format'
 
 type CategoryBarsProps = {
   catSpend: Record<string, number>
+  categories: CategoryRow[]
 }
 
-export function CategoryBars({ catSpend }: CategoryBarsProps) {
+export function CategoryBars({ catSpend, categories }: CategoryBarsProps) {
+  const hueFor = (nome: string) => categories.find((c) => c.nome === nome)?.hue ?? 0
   const maxCat = Math.max(1, ...Object.values(catSpend))
   const bars = Object.keys(catSpend)
     .sort((a, b) => catSpend[b] - catSpend[a])
@@ -14,7 +16,7 @@ export function CategoryBars({ catSpend }: CategoryBarsProps) {
       nome,
       valorDisplay: fmt(catSpend[nome]),
       widthPct: (catSpend[nome] / maxCat) * 100,
-      color: colorFor(hues[nome] ?? 0),
+      color: colorFor(hueFor(nome)),
     }))
 
   return (

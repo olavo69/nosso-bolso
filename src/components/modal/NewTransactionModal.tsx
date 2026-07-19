@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react'
-import { budgets, invCategorias, type Pessoa, type Transaction, type TransactionType } from '../../data/mockData'
-import { useTransactions } from '../../context/TransactionsContext'
+import { useAuth } from '../../context/AuthContext'
+import { useCategories } from '../../context/CategoriesContext'
+import { useTransactions, type NewTransactionInput } from '../../context/TransactionsContext'
+import type { TransactionRow } from '../../types/db'
 
-const receitaCategorias = ['Salário', 'Freelance', 'Outros']
-const despesaCategorias = Object.keys(budgets)
-
-function categoriasFor(type: TransactionType) {
-  if (type === 'receita') return receitaCategorias
-  if (type === 'investimento') return invCategorias
-  return despesaCategorias
-}
+type TransactionType = TransactionRow['type']
 
 type RepeticaoKey = 'unica' | 'parcelada' | 'recorrente'
 
@@ -18,50 +13,18 @@ type FormState = {
   categoria: string
   data: string
   descricao: string
-  pessoa: Pessoa
+  pessoaId: string | null
   pago: boolean
   repeticao: RepeticaoKey
   parcelas: number
 }
 
-function defaultForm(type: TransactionType): FormState {
-  return {
-    valor: '',
-    categoria: categoriasFor(type)[0],
-    data: '2026-07-18',
-    descricao: '',
-    pessoa: 'ana',
-    pago: true,
-    repeticao: 'unica',
-    parcelas: 2,
-  }
-}
-
 const paidStatuses = ['pago', 'recebido', 'aplicado']
-
-function formFromTransaction(tx: Transaction): FormState {
-  return {
-    valor: String(tx.amount),
-    categoria: tx.categoria,
-    data: tx.date,
-    descricao: tx.descricao,
-    pessoa: tx.pessoa,
-    pago: tx.status === undefined || paidStatuses.includes(tx.status),
-    repeticao: 'unica',
-    parcelas: 2,
-  }
-}
 
 const tabs: { key: TransactionType; label: string; activeColor: string }[] = [
   { key: 'receita', label: 'Receita', activeColor: 'var(--color-receita)' },
   { key: 'despesa', label: 'Despesa', activeColor: 'var(--color-despesa)' },
   { key: 'investimento', label: 'Investimento', activeColor: 'var(--color-investimento)' },
-]
-
-const pessoaOptions: { key: Pessoa; label: string }[] = [
-  { key: 'ana', label: 'Ana' },
-  { key: 'marcos', label: 'Marcos' },
-  { key: 'casal', label: 'Casal' },
 ]
 
 const repeticaoOptions: { key: RepeticaoKey; label: string }[] = [
@@ -72,7 +35,7 @@ const repeticaoOptions: { key: RepeticaoKey; label: string }[] = [
 
 type NewTransactionModalProps = {
   open: boolean
-  editing: Transaction | null
+  editing: TransactionRow | null
   defaultType: TransactionType
   onClose: () => void
 }
@@ -83,9 +46,47 @@ export function NewTransactionModal({
   defaultType,
   onClose,
 }: NewTransactionModalProps) {
+  const { profile, partnerProfile } = useAuth()
+  const { categories } = useCategories()
   const { addTransactions, updateTransaction } = useTransactions()
   const [modalType, setModalType] = useState<TransactionType>(defaultType)
-  const [form, setForm] = useState<FormState>(() => defaultForm(defaultType))
+  const [form, setForm] = useState<FormState | null>(null)
+
+  const pessoaOptions = [
+    { key: profile?.id ?? null, label: profile?.name ?? 'Você' },
+    ...(partnerProfile ? [{ key: partnerProfile.id, label: partnerProfile.name }] : []),
+    { key: null, label: 'Casal' },
+  ]
+
+  function categoriasFor(type: TransactionType) {
+    return categories.filter((c) => c.tipo === type).map((c) => c.nome)
+  }
+
+  function defaultForm(type: TransactionType): FormState {
+    return {
+      valor: '',
+      categoria: categoriasFor(type)[0] ?? '',
+      data: new Date().toISOString().slice(0, 10),
+      descricao: '',
+      pessoaId: profile?.id ?? null,
+      pago: true,
+      repeticao: 'unica',
+      parcelas: 2,
+    }
+  }
+
+  function formFromTransaction(tx: TransactionRow): FormState {
+    return {
+      valor: String(tx.amount),
+      categoria: tx.categoria,
+      data: tx.data,
+      descricao: tx.descricao,
+      pessoaId: tx.pessoa_id,
+      pago: tx.status == null || paidStatuses.includes(tx.status),
+      repeticao: 'unica',
+      parcelas: 2,
+    }
+  }
 
   useEffect(() => {
     if (!open) return
@@ -96,15 +97,16 @@ export function NewTransactionModal({
       setModalType(defaultType)
       setForm(defaultForm(defaultType))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing, defaultType])
 
-  if (!open) return null
+  if (!open || !form) return null
 
   const isEditing = editing !== null
 
   function changeTab(type: TransactionType) {
     setModalType(type)
-    setForm((f) => ({ ...f, categoria: categoriasFor(type)[0] }))
+    setForm((f) => (f ? { ...f, categoria: categoriasFor(type)[0] ?? '' } : f))
   }
 
   const pagoLabel =
@@ -112,7 +114,8 @@ export function NewTransactionModal({
   const naoPagoLabel =
     modalType === 'receita' ? 'A receber' : modalType === 'investimento' ? 'A aplicar' : 'Não pago'
 
-  function handleSave() {
+  async function handleSave() {
+    if (!form) return
     const valorTotal = parseFloat(form.valor)
     if (!valorTotal || valorTotal <= 0) return
 
@@ -130,13 +133,11 @@ export function NewTransactionModal({
           : 'pendente'
 
     if (isEditing && editing) {
-      const [, m0] = form.data.split('-').map(Number)
-      updateTransaction(editing.id, {
-        month: m0 - 1,
-        date: form.data,
+      await updateTransaction(editing.id, {
+        data: form.data,
         descricao: baseDesc,
         categoria: form.categoria,
-        pessoa: form.pessoa,
+        pessoa_id: form.pessoaId,
         type: modalType,
         amount: valorTotal,
         status,
@@ -152,24 +153,25 @@ export function NewTransactionModal({
     const count = form.repeticao === 'parcelada' ? form.parcelas : form.repeticao === 'recorrente' ? 12 : 1
     const amountEach = form.repeticao === 'parcelada' ? +(valorTotal / count).toFixed(2) : valorTotal
 
-    const newTxs: Omit<Transaction, 'id'>[] = []
+    const newTxs: NewTransactionInput[] = []
     for (let i = 0; i < count; i++) {
       const dt = new Date(y0, m0 - 1 + i, d0)
       const desc = form.repeticao === 'parcelada' ? `${baseDesc} (${i + 1}/${count})` : baseDesc
       newTxs.push({
-        month: dt.getMonth(),
-        date: dt.toISOString().slice(0, 10),
+        data: dt.toISOString().slice(0, 10),
         descricao: desc,
         categoria: form.categoria,
-        pessoa: form.pessoa,
+        pessoa_id: form.pessoaId,
         type: modalType,
         amount: amountEach,
         status: i === 0 ? status : pendingStatus,
         recorrente: form.repeticao === 'recorrente',
+        parcela_atual: form.repeticao === 'parcelada' ? i + 1 : null,
+        parcela_total: form.repeticao === 'parcelada' ? count : null,
       })
     }
 
-    addTransactions(newTxs)
+    await addTransactions(newTxs)
     onClose()
   }
 
@@ -218,7 +220,7 @@ export function NewTransactionModal({
           <input
             type="number"
             value={form.valor}
-            onChange={(e) => setForm((f) => ({ ...f, valor: e.target.value }))}
+            onChange={(e) => setForm((f) => (f ? { ...f, valor: e.target.value } : f))}
             placeholder="R$ 0,00"
             className="rounded-control border border-border px-3.5 py-3 text-[15px] font-bold outline-none"
           />
@@ -231,7 +233,9 @@ export function NewTransactionModal({
             </div>
             <select
               value={form.categoria}
-              onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => (f ? { ...f, categoria: e.target.value } : f))
+              }
               className="rounded-control border border-border px-2.5 py-3 text-[13.5px] outline-none"
             >
               {categoriasFor(modalType).map((opt) => (
@@ -246,7 +250,7 @@ export function NewTransactionModal({
             <input
               type="date"
               value={form.data}
-              onChange={(e) => setForm((f) => ({ ...f, data: e.target.value }))}
+              onChange={(e) => setForm((f) => (f ? { ...f, data: e.target.value } : f))}
               className="rounded-control border border-border px-2.5 py-3 text-[13.5px] outline-none"
             />
           </div>
@@ -257,11 +261,11 @@ export function NewTransactionModal({
           <div className="flex gap-2">
             {pessoaOptions.map((po) => (
               <button
-                key={po.key}
+                key={po.key ?? 'casal'}
                 type="button"
-                onClick={() => setForm((f) => ({ ...f, pessoa: po.key }))}
+                onClick={() => setForm((f) => (f ? { ...f, pessoaId: po.key } : f))}
                 className={`flex-1 rounded-[10px] py-2.5 text-center text-[12.5px] font-semibold ${
-                  form.pessoa === po.key ? 'bg-text text-bg' : 'bg-bg text-[#5B5F58]'
+                  form.pessoaId === po.key ? 'bg-text text-bg' : 'bg-bg text-[#5B5F58]'
                 }`}
               >
                 {po.label}
@@ -277,7 +281,9 @@ export function NewTransactionModal({
           <input
             type="text"
             value={form.descricao}
-            onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => (f ? { ...f, descricao: e.target.value } : f))
+            }
             placeholder="Ex: Supermercado"
             className="rounded-control border border-border px-3.5 py-3 text-[13.5px] outline-none"
           />
@@ -288,7 +294,7 @@ export function NewTransactionModal({
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setForm((f) => ({ ...f, pago: true }))}
+              onClick={() => setForm((f) => (f ? { ...f, pago: true } : f))}
               className={`flex-1 rounded-[10px] py-2.5 text-center text-[13px] font-bold ${
                 form.pago ? 'bg-text text-bg' : 'bg-bg text-[#5B5F58]'
               }`}
@@ -297,7 +303,7 @@ export function NewTransactionModal({
             </button>
             <button
               type="button"
-              onClick={() => setForm((f) => ({ ...f, pago: false }))}
+              onClick={() => setForm((f) => (f ? { ...f, pago: false } : f))}
               className={`flex-1 rounded-[10px] py-2.5 text-center text-[13px] font-bold ${
                 !form.pago ? 'bg-text text-bg' : 'bg-bg text-[#5B5F58]'
               }`}
@@ -317,7 +323,9 @@ export function NewTransactionModal({
                 <button
                   key={r.key}
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, repeticao: r.key }))}
+                  onClick={() =>
+                    setForm((f) => (f ? { ...f, repeticao: r.key } : f))
+                  }
                   className={`flex-1 rounded-[9px] py-2.5 text-center text-[12.5px] font-bold ${
                     form.repeticao === r.key ? 'bg-text text-bg' : 'text-[#5B5F58]'
                   }`}
@@ -337,10 +345,14 @@ export function NewTransactionModal({
                   min={2}
                   value={form.parcelas}
                   onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      parcelas: Math.max(2, parseInt(e.target.value, 10) || 2),
-                    }))
+                    setForm((f) =>
+                      f
+                        ? {
+                            ...f,
+                            parcelas: Math.max(2, parseInt(e.target.value, 10) || 2),
+                          }
+                        : f,
+                    )
                   }
                   className="w-[70px] rounded-[10px] border border-border px-2.5 py-2 text-[13px] outline-none"
                 />

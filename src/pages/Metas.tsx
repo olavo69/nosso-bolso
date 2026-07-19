@@ -1,7 +1,9 @@
 import { GoalCard } from '../components/metas/GoalCard'
-import { goals } from '../data/mockData'
+import { useGoals } from '../context/GoalsContext'
 
 export function Metas() {
+  const { goals } = useGoals()
+
   return (
     <div className="grid grid-cols-2 gap-[18px]">
       {goals.map((goal) => (

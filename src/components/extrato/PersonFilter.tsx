@@ -1,19 +1,12 @@
-import type { Pessoa } from '../../data/mockData'
-
-type PersonFilterKey = 'todos' | Pessoa
-
-const options: { key: PersonFilterKey; label: string }[] = [
-  { key: 'todos', label: 'Todos' },
-  { key: 'ana', label: 'Ana' },
-  { key: 'marcos', label: 'Marcos' },
-]
+export type PersonFilterValue = 'todos' | string
 
 type PersonFilterProps = {
-  value: PersonFilterKey
-  onChange: (value: PersonFilterKey) => void
+  options: { key: PersonFilterValue; label: string }[]
+  value: PersonFilterValue
+  onChange: (value: PersonFilterValue) => void
 }
 
-export function PersonFilter({ value, onChange }: PersonFilterProps) {
+export function PersonFilter({ options, value, onChange }: PersonFilterProps) {
   return (
     <div className="flex gap-2">
       {options.map((option) => (

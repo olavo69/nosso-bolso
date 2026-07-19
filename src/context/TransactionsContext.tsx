@@ -1,42 +1,73 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { transactions as initialTransactions, type Transaction } from '../data/mockData'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
+import { supabase } from '../lib/supabaseClient'
+import type { TransactionRow } from '../types/db'
+import { useAuth } from './AuthContext'
+
+export type NewTransactionInput = Omit<TransactionRow, 'id' | 'couple_id' | 'created_at'>
 
 type TransactionsContextValue = {
-  transactions: Transaction[]
-  addTransactions: (newTxs: Omit<Transaction, 'id'>[]) => void
-  updateTransaction: (id: number, updates: Partial<Omit<Transaction, 'id'>>) => void
+  transactions: TransactionRow[]
+  loading: boolean
+  addTransactions: (rows: NewTransactionInput[]) => Promise<void>
+  updateTransaction: (id: string, updates: Partial<NewTransactionInput>) => Promise<void>
 }
 
 const TransactionsContext = createContext<TransactionsContextValue | null>(null)
 
 export function TransactionsProvider({ children }: { children: ReactNode }) {
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions)
+  const { profile } = useAuth()
+  const [transactions, setTransactions] = useState<TransactionRow[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const addTransactions = (newTxs: Omit<Transaction, 'id'>[]) => {
-    setTransactions((prev) => {
-      let nextId = Math.max(0, ...prev.map((t) => t.id)) + 1
-      return [...prev, ...newTxs.map((tx) => ({ ...tx, id: nextId++ }))]
-    })
+  async function refetch() {
+    if (!supabase || !profile?.couple_id) {
+      setTransactions([])
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    const { data } = await supabase
+      .from('transactions')
+      .select('*')
+      .order('data', { ascending: false })
+    setTransactions(data ?? [])
+    setLoading(false)
   }
 
-  const updateTransaction = (
-    id: number,
-    updates: Partial<Omit<Transaction, 'id'>>,
-  ) => {
-    setTransactions((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-    )
+  useEffect(() => {
+    refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.couple_id])
+
+  async function addTransactions(rows: NewTransactionInput[]) {
+    if (!supabase || !profile?.couple_id) return
+    const withCouple = rows.map((r) => ({ ...r, couple_id: profile.couple_id }))
+    const { error } = await supabase.from('transactions').insert(withCouple)
+    if (error) throw error
+    await refetch()
+  }
+
+  async function updateTransaction(id: string, updates: Partial<NewTransactionInput>) {
+    if (!supabase) return
+    const { error } = await supabase.from('transactions').update(updates).eq('id', id)
+    if (error) throw error
+    await refetch()
   }
 
   const value = useMemo(
-    () => ({ transactions, addTransactions, updateTransaction }),
-    [transactions],
+    () => ({ transactions, loading, addTransactions, updateTransaction }),
+    [transactions, loading],
   )
 
   return (
-    <TransactionsContext.Provider value={value}>
-      {children}
-    </TransactionsContext.Provider>
+    <TransactionsContext.Provider value={value}>{children}</TransactionsContext.Provider>
   )
 }
 

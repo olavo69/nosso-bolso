@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import { useTransactions } from '../context/TransactionsContext'
+import { useCategories } from '../context/CategoriesContext'
+import { useGoals } from '../context/GoalsContext'
 import { buildFinancialContext } from '../lib/financialContext'
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient'
 import { DEFAULT_MONTH_INDEX } from '../data/mockData'
+import type { ChatMessageRow } from '../types/db'
 
 type ChatTurn = { from: 'user' | 'bot'; text: string }
 
@@ -12,19 +16,46 @@ const suggestions = [
   'Dá pra economizar mais?',
 ]
 
-const initialMessages: ChatTurn[] = [
-  {
-    from: 'bot',
-    text: 'Oi Ana! Sou a assistente do Nosso Bolso. Posso te ajudar a entender os gastos do casal. O que quer saber?',
-  },
-]
+const welcomeMessage: ChatTurn = {
+  from: 'bot',
+  text: 'Oi! Sou a assistente do Nosso Bolso. Posso te ajudar a entender os gastos do casal. O que quer saber?',
+}
 
 export function Chat() {
+  const { profile } = useAuth()
   const { transactions } = useTransactions()
-  const [messages, setMessages] = useState<ChatTurn[]>(initialMessages)
+  const { categories } = useCategories()
+  const { goals } = useGoals()
+  const [messages, setMessages] = useState<ChatTurn[]>([welcomeMessage])
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadHistory() {
+      if (!supabase || !profile?.couple_id) return
+      const { data } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .order('created_at', { ascending: true })
+      if (data && data.length > 0) {
+        setMessages(
+          data.map((m: ChatMessageRow) => ({ from: m.from_role, text: m.text })),
+        )
+      }
+    }
+    loadHistory()
+  }, [profile?.couple_id])
+
+  async function persistMessage(fromRole: 'user' | 'bot', text: string) {
+    if (!supabase || !profile?.couple_id) return
+    await supabase.from('chat_messages').insert({
+      couple_id: profile.couple_id,
+      profile_id: fromRole === 'user' ? profile.id : null,
+      from_role: fromRole,
+      text,
+    })
+  }
 
   async function sendText(text: string) {
     if (!text.trim() || typing) return
@@ -33,6 +64,7 @@ export function Chat() {
     setMessages((m) => [...m, { from: 'user', text }])
     setInput('')
     setError(null)
+    persistMessage('user', text)
 
     if (!supabase) {
       setError(
@@ -43,12 +75,18 @@ export function Chat() {
 
     setTyping(true)
     try {
-      const financialContext = buildFinancialContext(transactions, DEFAULT_MONTH_INDEX)
+      const financialContext = buildFinancialContext(
+        transactions,
+        categories,
+        goals,
+        DEFAULT_MONTH_INDEX,
+      )
       const { data, error: fnError } = await supabase.functions.invoke('chat', {
         body: { message: text, history, financialContext },
       })
       if (fnError) throw fnError
       setMessages((m) => [...m, { from: 'bot', text: data.reply }])
+      persistMessage('bot', data.reply)
     } catch {
       setError('Não consegui falar com a IA agora. Tenta de novo em instantes.')
     } finally {

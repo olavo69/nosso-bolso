@@ -1,4 +1,4 @@
-import type { Pessoa, TransactionType } from '../data/mockData'
+import type { TransactionType } from '../data/mockData'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -17,8 +17,14 @@ export function tintFor(hue: number) {
   return `oklch(94% 0.03 ${hue})`
 }
 
-export function pessoaLabel(p: Pessoa) {
-  return p === 'ana' ? 'Ana' : p === 'marcos' ? 'Marcos' : 'Casal'
+export function initials(name: string) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
 }
 
 export function dataLabel(date: string) {

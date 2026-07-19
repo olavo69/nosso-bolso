@@ -7,14 +7,18 @@ import { PeriodBar } from '../components/PeriodBar'
 import { RecentTransactions } from '../components/dashboard/RecentTransactions'
 import { SpendChart } from '../components/dashboard/SpendChart'
 import { SummaryCards } from '../components/dashboard/SummaryCards'
-import { DEFAULT_MONTH_INDEX, goals, monthlyHistory } from '../data/mockData'
+import { DEFAULT_MONTH_INDEX, monthlyHistory } from '../data/mockData'
 import { useTransactions } from '../context/TransactionsContext'
+import { useGoals } from '../context/GoalsContext'
+import { useCategories } from '../context/CategoriesContext'
 import type { AppOutletContext } from '../layouts/AppLayout'
 import { getPeriodTx, periodLabel, usePeriod } from '../lib/period'
 import { ACCENT } from '../lib/theme'
 
 export function Dashboard() {
   const { transactions } = useTransactions()
+  const { goals } = useGoals()
+  const { categories } = useCategories()
   const { openEditModal } = useOutletContext<AppOutletContext>()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
 
@@ -54,8 +58,10 @@ export function Dashboard() {
   const recentTx = useMemo(
     () =>
       transactions
-        .filter((t) => t.month === period.monthIndex)
-        .sort((a, b) => b.date.localeCompare(a.date))
+        .filter(
+          (t) => new Date(`${t.data}T00:00:00`).getMonth() === period.monthIndex,
+        )
+        .sort((a, b) => b.data.localeCompare(a.data))
         .slice(0, 5),
     [transactions, period.monthIndex],
   )
@@ -95,7 +101,7 @@ export function Dashboard() {
           monthIndex={period.monthIndex}
           accent={ACCENT}
         />
-        <CategoryBars catSpend={catSpend} />
+        <CategoryBars catSpend={catSpend} categories={categories} />
       </div>
 
       <div className="grid grid-cols-[1.3fr_1fr] items-start gap-[18px]">

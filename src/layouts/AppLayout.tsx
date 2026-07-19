@@ -3,17 +3,17 @@ import { Outlet, useLocation } from 'react-router'
 import { Sidebar } from '../components/Sidebar'
 import { Topbar } from '../components/Topbar'
 import { NewTransactionModal } from '../components/modal/NewTransactionModal'
-import type { Transaction } from '../data/mockData'
+import type { TransactionRow } from '../types/db'
 
 export type AppOutletContext = {
   coupleMode: boolean
-  openEditModal: (transaction: Transaction) => void
+  openEditModal: (transaction: TransactionRow) => void
 }
 
 export function AppLayout() {
   const [coupleMode, setCoupleMode] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
-  const [editingTx, setEditingTx] = useState<Transaction | null>(null)
+  const [editingTx, setEditingTx] = useState<TransactionRow | null>(null)
   const { pathname } = useLocation()
 
   function openCreateModal() {
@@ -21,7 +21,7 @@ export function AppLayout() {
     setModalOpen(true)
   }
 
-  function openEditModal(transaction: Transaction) {
+  function openEditModal(transaction: TransactionRow) {
     setEditingTx(transaction)
     setModalOpen(true)
   }

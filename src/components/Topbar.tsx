@@ -1,5 +1,7 @@
 import { useLocation } from 'react-router'
 import { navItems, viewTitles } from '../lib/navigation'
+import { useAuth } from '../context/AuthContext'
+import { initials } from '../lib/format'
 
 type TopbarProps = {
   coupleMode: boolean
@@ -13,8 +15,11 @@ export function Topbar({
   onNewTransaction,
 }: TopbarProps) {
   const { pathname } = useLocation()
+  const { profile, partnerProfile } = useAuth()
   const view = navItems.find((item) => item.path === pathname)?.key ?? 'dashboard'
-  const [title, subtitle] = viewTitles[view]
+  const [defaultTitle, subtitle] = viewTitles[view]
+  const firstName = profile?.name.split(' ')[0]
+  const title = view === 'dashboard' && firstName ? `Olá, ${firstName} 👋` : defaultTitle
 
   return (
     <header className="flex h-[76px] shrink-0 items-center justify-between border-b border-border bg-topbar-bg px-8">
@@ -49,11 +54,11 @@ export function Topbar({
 
         <div className="flex items-center">
           <div className="z-[2] flex h-[34px] w-[34px] items-center justify-center rounded-full border-2 border-topbar-bg bg-[#D9C9A3] text-xs font-bold text-text">
-            AS
+            {profile ? initials(profile.name) : '…'}
           </div>
-          {coupleMode && (
+          {coupleMode && partnerProfile && (
             <div className="-ml-[10px] flex h-[34px] w-[34px] items-center justify-center rounded-full border-2 border-topbar-bg bg-[#A9C9B8] text-xs font-bold text-text">
-              MS
+              {initials(partnerProfile.name)}
             </div>
           )}
         </div>

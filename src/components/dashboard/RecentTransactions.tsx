@@ -1,21 +1,24 @@
 import { useNavigate } from 'react-router'
-import { hues, type Transaction } from '../../data/mockData'
+import { useCategories } from '../../context/CategoriesContext'
+import { usePessoaLabel } from '../../lib/usePessoaLabel'
+import type { TransactionRow } from '../../types/db'
 import {
   amountColor,
   amountDisplay,
   colorFor,
   dataLabel,
-  pessoaLabel,
   tintFor,
 } from '../../lib/format'
 
 type RecentTransactionsProps = {
-  transactions: Transaction[]
-  onEdit: (transaction: Transaction) => void
+  transactions: TransactionRow[]
+  onEdit: (transaction: TransactionRow) => void
 }
 
 export function RecentTransactions({ transactions, onEdit }: RecentTransactionsProps) {
   const navigate = useNavigate()
+  const { categories } = useCategories()
+  const pessoaLabel = usePessoaLabel()
 
   return (
     <div className="flex flex-col gap-3.5 rounded-card border border-border bg-surface p-[22px_24px]">
@@ -33,7 +36,7 @@ export function RecentTransactions({ transactions, onEdit }: RecentTransactionsP
       </div>
 
       {transactions.map((tx) => {
-        const hue = hues[tx.categoria] ?? 0
+        const hue = categories.find((c) => c.nome === tx.categoria)?.hue ?? 0
 
         return (
           <button
@@ -52,7 +55,7 @@ export function RecentTransactions({ transactions, onEdit }: RecentTransactionsP
             <div className="flex-1">
               <div className="text-[13.5px] font-semibold">{tx.descricao}</div>
               <div className="text-[11.5px] text-text-muted">
-                {tx.categoria} · {pessoaLabel(tx.pessoa)} · {dataLabel(tx.date)}
+                {tx.categoria} · {pessoaLabel(tx.pessoa_id)} · {dataLabel(tx.data)}
               </div>
             </div>
             <div

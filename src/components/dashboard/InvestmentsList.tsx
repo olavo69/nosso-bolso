@@ -1,12 +1,16 @@
-import { hues, type Transaction } from '../../data/mockData'
-import { colorFor, fmt, pessoaLabel, tintFor } from '../../lib/format'
+import { useCategories } from '../../context/CategoriesContext'
+import { usePessoaLabel } from '../../lib/usePessoaLabel'
+import type { TransactionRow } from '../../types/db'
+import { colorFor, fmt, tintFor } from '../../lib/format'
 
 type InvestmentsListProps = {
-  transactions: Transaction[]
-  onEdit: (transaction: Transaction) => void
+  transactions: TransactionRow[]
+  onEdit: (transaction: TransactionRow) => void
 }
 
 export function InvestmentsList({ transactions, onEdit }: InvestmentsListProps) {
+  const { categories } = useCategories()
+  const pessoaLabel = usePessoaLabel()
   const investmentRows = transactions.filter((t) => t.type === 'investimento')
 
   return (
@@ -22,7 +26,7 @@ export function InvestmentsList({ transactions, onEdit }: InvestmentsListProps) 
       )}
 
       {investmentRows.map((tx) => {
-        const hue = hues[tx.categoria] ?? 0
+        const hue = categories.find((c) => c.nome === tx.categoria)?.hue ?? 0
         const statusColor =
           tx.status === 'a aplicar'
             ? 'var(--color-pendente)'
@@ -45,7 +49,7 @@ export function InvestmentsList({ transactions, onEdit }: InvestmentsListProps) 
             <div className="flex-1">
               <div className="text-[13.5px] font-semibold">{tx.descricao}</div>
               <div className="text-[11.5px] text-text-muted">
-                {tx.categoria} · {pessoaLabel(tx.pessoa)}
+                {tx.categoria} · {pessoaLabel(tx.pessoa_id)}
               </div>
             </div>
             <div className="text-right">

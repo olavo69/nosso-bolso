@@ -16,7 +16,7 @@ export const navItems: { key: ViewKey; label: string; path: string }[] = [
 ]
 
 export const viewTitles: Record<ViewKey, [string, string]> = {
-  dashboard: ['Olá, Ana 👋', 'Aqui está o resumo financeiro do casal'],
+  dashboard: ['Olá 👋', 'Aqui está o resumo financeiro do casal'],
   extrato: ['Extrato mensal', 'Todas as transações do período'],
   categorias: ['Categorias', 'Orçamento e gastos por categoria'],
   metas: ['Metas', 'Acompanhe os objetivos do casal'],

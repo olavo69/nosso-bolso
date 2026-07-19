@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router'
-import type { Goal } from '../../data/mockData'
+import type { GoalRow } from '../../types/db'
 import { colorFor } from '../../lib/format'
 
 type GoalsInFocusProps = {
-  goals: Goal[]
+  goals: GoalRow[]
 }
 
 export function GoalsInFocus({ goals }: GoalsInFocusProps) {
@@ -24,7 +24,7 @@ export function GoalsInFocus({ goals }: GoalsInFocusProps) {
       </div>
 
       {topGoals.map((goal) => {
-        const pct = Math.min(100, Math.round((goal.current / goal.target) * 100))
+        const pct = Math.min(100, Math.round((goal.current_amount / goal.target) * 100))
         return (
           <div key={goal.id} className="flex flex-col gap-1.5">
             <div className="flex justify-between text-[12.5px]">

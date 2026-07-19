@@ -1,12 +1,12 @@
-import type { Goal } from '../../data/mockData'
+import type { GoalRow } from '../../types/db'
 import { colorFor, fmt, tintFor } from '../../lib/format'
 
 type GoalCardProps = {
-  goal: Goal
+  goal: GoalRow
 }
 
 export function GoalCard({ goal }: GoalCardProps) {
-  const pct = Math.min(100, Math.round((goal.current / goal.target) * 100))
+  const pct = Math.min(100, Math.round((goal.current_amount / goal.target) * 100))
 
   return (
     <div className="pop-in flex flex-col gap-3.5 rounded-card border border-border bg-surface p-6">
@@ -34,7 +34,7 @@ export function GoalCard({ goal }: GoalCardProps) {
 
       <div className="flex justify-between text-[13.5px] text-text-secondary">
         <div>
-          Guardado: <span className="font-bold text-text">{fmt(goal.current)}</span>
+          Guardado: <span className="font-bold text-text">{fmt(goal.current_amount)}</span>
         </div>
         <div>
           Meta: <span className="font-bold text-text">{fmt(goal.target)}</span>

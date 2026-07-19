@@ -1,11 +1,16 @@
-import { budgets, goals, months, type Transaction } from '../data/mockData'
+import { months } from '../data/mockData'
+import type { CategoryRow, GoalRow, TransactionRow } from '../types/db'
 import { fmt } from './format'
 
 export function buildFinancialContext(
-  transactions: Transaction[],
+  transactions: TransactionRow[],
+  categories: CategoryRow[],
+  goals: GoalRow[],
   monthIndex: number,
 ) {
-  const monthTx = transactions.filter((t) => t.month === monthIndex)
+  const monthTx = transactions.filter(
+    (t) => new Date(`${t.data}T00:00:00`).getMonth() === monthIndex,
+  )
   const income = monthTx
     .filter((t) => t.type === 'receita')
     .reduce((sum, t) => sum + t.amount, 0)
@@ -23,19 +28,20 @@ export function buildFinancialContext(
       catSpend[t.categoria] = (catSpend[t.categoria] ?? 0) + t.amount
     })
 
-  const categoriasLines = Object.keys(budgets)
-    .map((nome) => {
-      const spent = catSpend[nome] ?? 0
-      const budget = budgets[nome]
+  const categoriasLines = categories
+    .filter((c) => c.tipo === 'despesa')
+    .map((c) => {
+      const spent = catSpend[c.nome] ?? 0
+      const budget = c.budget ?? 0
       const status = spent > budget ? 'acima do orçamento' : 'dentro do orçamento'
-      return `- ${nome}: gasto ${fmt(spent)} de orçamento ${fmt(budget)} (${status})`
+      return `- ${c.nome}: gasto ${fmt(spent)} de orçamento ${fmt(budget)} (${status})`
     })
     .join('\n')
 
   const metasLines = goals
     .map((g) => {
-      const pct = Math.round((g.current / g.target) * 100)
-      return `- ${g.nome}: ${fmt(g.current)} guardados de ${fmt(g.target)} (${pct}%), prazo ${g.prazo}`
+      const pct = Math.round((g.current_amount / g.target) * 100)
+      return `- ${g.nome}: ${fmt(g.current_amount)} guardados de ${fmt(g.target)} (${pct}%), prazo ${g.prazo}`
     })
     .join('\n')
 
