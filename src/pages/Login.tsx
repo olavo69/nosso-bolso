@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { supabase } from '../lib/supabaseClient'
 
 type Mode = 'entrar' | 'cadastrar'
 
 export function Login() {
-  const [mode, setMode] = useState<Mode>('entrar')
+  const [searchParams] = useSearchParams()
+  const [mode, setMode] = useState<Mode>(searchParams.get('mode') === 'cadastrar' ? 'cadastrar' : 'entrar')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

@@ -47,6 +47,8 @@ Testado de ponta a ponta: 2 contas reais cadastradas, vinculadas via código de 
 
 Nota: `mailer_autoconfirm` foi ativado temporariamente durante os testes (contas de teste sem confirmação por e-mail) e reativado (`false`) em seguida — cadastros agora exigem confirmação por e-mail antes de entrar. O Supabase usa seu mailer próprio no plano gratuito (limite baixo de envios/hora); configurar SMTP próprio fica como item da Fase 11 se o volume de cadastro exigir.
 
+- [x] Landing page (`/`) para visitantes sem sessão — gap do design original, que não tinha essa tela. Copy e estrutura (hero, funcionalidades, "como funciona", depoimentos, FAQ, CTA) geradas com apoio de IA de design e portadas pra `src/pages/Landing.tsx` usando os mesmos tokens visuais do app. `/login` ganhou suporte a `?mode=cadastrar` pro CTA "Criar conta grátis" abrir direto na aba de cadastro.
+
 ## Fase 3 — Shell da aplicação
 - [x] Sidebar fixa (232px, `#1B1F1C`, 6 seções)
 - [x] Topbar (76px): título da tela, toggle Individual/Casal, avatares, botão "+ Nova transação"

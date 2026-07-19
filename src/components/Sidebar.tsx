@@ -52,16 +52,6 @@ export function Sidebar() {
           Sair
         </button>
       </nav>
-
-      <div className="mt-auto flex flex-col gap-2 rounded-2xl border border-sidebar-card-border bg-sidebar-card p-4">
-        <div className="font-heading text-[13px] font-bold text-accent">
-          Dica da IA
-        </div>
-        <div className="text-[12.5px] leading-relaxed text-sidebar-hint">
-          Vocês gastaram 12% menos com Lazer este mês. Bom ritmo para a meta
-          da viagem!
-        </div>
-      </div>
     </aside>
   )
 }
