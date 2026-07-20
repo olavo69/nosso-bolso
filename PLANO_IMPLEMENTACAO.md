@@ -99,10 +99,12 @@ Modelo em uso: `openai/gpt-oss-20b:free` (gratuito, testado e estável — outro
 - [x] Resetar todos os dados — gap do design original; botão em "Conta" abre modal que exige confirmar a senha atual (`signInWithPassword`) antes de chamar a função `reset_couple_data()` (apaga transações/metas/categorias do casal e re-semeia as categorias padrão)
 
 ## Fase 11 — Deploy & polish
-- [ ] Deploy de produção no Cloudflare Pages
-- [ ] Variáveis de ambiente configuradas (Supabase URL/anon key, etc.)
-- [ ] Teste manual das 6 telas + modal, comparando com as screenshots de referência
+- [x] Deploy de produção no Cloudflare Pages — https://nosso-bolso-5cl.pages.dev, projeto `nosso-bolso` conectado ao repo `olavo69/nosso-bolso` (build automático a cada `git push` na `main`)
+- [x] Variáveis de ambiente configuradas (Supabase URL/anon key, etc.) — as variáveis do painel do Cloudflare não estavam chegando no passo de build (bug/limite da plataforma, builds sucessivos saíam com bundle idêntico); contornado commitando `.env.production` com os valores públicos (URL + anon key — protegidos por RLS, não por sigilo, então é seguro versionar)
+- [x] Teste manual pós-deploy: landing page e login/dashboard testados direto em produção (conta da Ana), carregando dados reais do Supabase sem erros de console
+- [ ] Teste manual completo das 6 telas + modal em produção, comparando com as screenshots de referência
 - [ ] Checagem de responsividade básica (design é desktop-first, mas vale checar breakpoints mínimos)
+- [ ] Domínio customizado (opcional — hoje roda no subdomínio gratuito `.pages.dev`)
 
 ---
 
