@@ -103,8 +103,25 @@ Modelo em uso: `openai/gpt-oss-20b:free` (gratuito, testado e estável — outro
 - [x] Variáveis de ambiente configuradas (Supabase URL/anon key, etc.) — as variáveis do painel do Cloudflare não estavam chegando no passo de build (bug/limite da plataforma, builds sucessivos saíam com bundle idêntico); contornado commitando `.env.production` com os valores públicos (URL + anon key — protegidos por RLS, não por sigilo, então é seguro versionar)
 - [x] Teste manual pós-deploy: landing page e login/dashboard testados direto em produção (conta da Ana), carregando dados reais do Supabase sem erros de console
 - [ ] Teste manual completo das 6 telas + modal em produção, comparando com as screenshots de referência
-- [ ] Checagem de responsividade básica (design é desktop-first, mas vale checar breakpoints mínimos)
 - [ ] Domínio customizado (opcional — hoje roda no subdomínio gratuito `.pages.dev`)
+
+## Fase 12 — Responsivo (navegador mobile)
+
+Hoje o app é desktop-first: sidebar fixa de 232px, grids de 2-4 colunas, modal com largura fixa. O objetivo dessa fase é o site inteiro ficar usável abrindo direto pelo navegador do celular (Safari/Chrome mobile), sem precisar de app nativo (isso fica pra Fase 13).
+
+- [ ] Sidebar: virar menu inferior (bottom nav) ou gaveta/hambúrguer em telas estreitas, em vez da coluna fixa lateral
+- [ ] Topbar: empilhar/reorganizar título, toggle Individual/Casal, avatares e botão "+ Nova transação" pra não quebrar em telas pequenas
+- [ ] Dashboard: cards de resumo (Saldo/Receitas/Despesas/Investido) e os dois gráficos empilhando em coluna única
+- [ ] Extrato, Categorias, Metas: grids de cards caindo pra 1 coluna
+- [ ] Modal "Nova transação": ocupar a tela cheia (ou quase) no mobile, em vez do card centralizado de largura fixa
+- [ ] Chat: bolhas e input funcionando bem com o teclado virtual do celular
+- [ ] Login: já é bem simples/centralizado, só validar em telas pequenas
+- [ ] Landing page: já tem alguns breakpoints (`md:`) da conversão inicial — revisar e completar pros demais elementos (hero, "como funciona", depoimentos)
+- [ ] Testar em pelo menos 2 larguras de referência (~375px e ~430px) antes de considerar concluído
+
+## Fase 13 — Apps nativos (iOS e Android)
+
+Anotado para depois da Fase 12. Ainda sem decisão de abordagem (React Native/Expo reaproveitando lógica, PWA instalável, Capacitor envolvendo o mesmo front web, etc.) — avaliar quando chegar a hora.
 
 ---
 
