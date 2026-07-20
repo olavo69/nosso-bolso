@@ -13,14 +13,14 @@ type SpendChartProps = {
 export function SpendChart({ monthlyHistory, monthIndex, accent }: SpendChartProps) {
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null)
 
-  const maxExpense = Math.max(...monthlyHistory.map((m) => m.expense))
+  const maxExpense = Math.max(...monthlyHistory.map((m) => m.expense), 0)
   const spendChart = monthlyHistory.map((m) => ({
     month: m.month,
     label: monthsShort[m.month],
     income: m.income,
     expense: m.expense,
     savings: m.income - m.expense,
-    heightPct: Math.max(4, (m.expense / maxExpense) * 100),
+    heightPct: maxExpense === 0 ? 4 : Math.max(4, (m.expense / maxExpense) * 100),
     isCurrent: m.month === monthIndex,
   }))
 

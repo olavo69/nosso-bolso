@@ -7,7 +7,8 @@ import { PeriodBar } from '../components/PeriodBar'
 import { RecentTransactions } from '../components/dashboard/RecentTransactions'
 import { SpendChart } from '../components/dashboard/SpendChart'
 import { SummaryCards } from '../components/dashboard/SummaryCards'
-import { DEFAULT_MONTH_INDEX, monthlyHistory } from '../data/mockData'
+import { DEFAULT_MONTH_INDEX } from '../data/mockData'
+import type { MonthlyHistory } from '../data/mockData'
 import { useTransactions } from '../context/TransactionsContext'
 import { useGoals } from '../context/GoalsContext'
 import { useCategories } from '../context/CategoriesContext'
@@ -55,6 +56,27 @@ export function Dashboard() {
     return spend
   }, [periodTx])
 
+  const chartHistory = useMemo<MonthlyHistory[]>(() => {
+    const endMonth = period.monthIndex
+    const startMonth = Math.max(0, endMonth - 5)
+    const history: MonthlyHistory[] = []
+    for (let m = startMonth; m <= endMonth; m++) {
+      const monthTx = transactions.filter(
+        (t) => new Date(`${t.data}T00:00:00`).getMonth() === m,
+      )
+      history.push({
+        month: m,
+        income: monthTx
+          .filter((t) => t.type === 'receita')
+          .reduce((sum, t) => sum + t.amount, 0),
+        expense: monthTx
+          .filter((t) => t.type === 'despesa')
+          .reduce((sum, t) => sum + t.amount, 0),
+      })
+    }
+    return history
+  }, [transactions, period.monthIndex])
+
   const recentTx = useMemo(
     () =>
       transactions
@@ -97,7 +119,7 @@ export function Dashboard() {
 
       <div className="grid grid-cols-[1.6fr_1fr] items-stretch gap-[18px]">
         <SpendChart
-          monthlyHistory={monthlyHistory}
+          monthlyHistory={chartHistory}
           monthIndex={period.monthIndex}
           accent={ACCENT}
         />
