@@ -107,6 +107,8 @@ Modelo em uso: `openai/gpt-oss-20b:free` (gratuito, testado e estável — outro
 
 Bug encontrado durante o teste manual em produção: o gráfico "Gastos e economia mês a mês" do Dashboard ainda usava o histórico mockado fixo (`monthlyHistory` de `mockData.ts`) em vez de calcular a partir das transações reais — aparecia igual em qualquer conta, inclusive depois de um reset. Corrigido calculando os 6 meses a partir de `transactions` de verdade.
 
+Bug encontrado com usuários reais testando: login com Google (e, possivelmente, links de confirmação de e-mail) falhavam com `ERR_CONNECTION_FAILED` apontando pra `localhost`. Causa: o **Site URL** e **Redirect URLs** do Supabase Auth (`Authentication → URL Configuration`) continuavam configurados só para `http://localhost:5173` — nunca tinham sido atualizados para o domínio de produção depois do deploy no Cloudflare. Corrigido adicionando `https://nosso-bolso-5cl.pages.dev` como Site URL e `https://nosso-bolso-5cl.pages.dev/**` em Redirect URLs. **Atenção**: se o domínio mudar (domínio customizado, por exemplo), essa configuração precisa ser atualizada de novo.
+
 ## Fase 12 — Responsivo (navegador mobile)
 
 Hoje o app é desktop-first: sidebar fixa de 232px, grids de 2-4 colunas, modal com largura fixa. O objetivo dessa fase é o site inteiro ficar usável abrindo direto pelo navegador do celular (Safari/Chrome mobile), sem precisar de app nativo (isso fica pra Fase 13).
