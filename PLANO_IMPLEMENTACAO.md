@@ -174,6 +174,11 @@ Duas situações diferentes, porque o WhatsApp trata mensagem "de resposta" e me
 - [ ] Fluxo de lançar transação por mensagem (com confirmação/pergunta de volta)
 - [ ] Fluxo de pergunta livre dentro da janela de 24h (reusa `buildFinancialContext`)
 - [ ] Template de relatório proativo + aprovação na Meta + job agendado (fase 2 desse recurso, não bloqueia o lançamento inicial)
+- [ ] (futuro) Relatório em PDF mandado por WhatsApp — ver Fase 15
+
+## Fase 15 — Importar planilha de finanças antigas
+
+Anotado, sem escopo detalhado ainda. Não é um problema de IA "pesada": ler o arquivo (CSV/Excel), mapear colunas pra data/valor/descrição/categoria/tipo (com o usuário confirmando o mapeamento antes de importar) e gravar em lote em `transactions` — parecido com o que a função `addTransactions` já faz pro parcelamento. IA entra só num ponto pontual, se a planilha não tiver categoria já definida: classificar a descrição numa das categorias existentes (chamada simples ao modelo, sem RAG nem banco vetorial).
 
 ---
 
