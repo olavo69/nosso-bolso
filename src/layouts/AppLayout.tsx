@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import { Sidebar } from '../components/Sidebar'
+import { MobileNav } from '../components/MobileNav'
 import { Topbar } from '../components/Topbar'
 import { NewTransactionModal } from '../components/modal/NewTransactionModal'
 import type { TransactionRow } from '../types/db'
@@ -44,13 +45,15 @@ export function AppLayout() {
 
         <main
           key={pathname}
-          className="view-transition flex-1 overflow-y-auto px-8 pt-7 pb-[60px]"
+          className="view-transition flex-1 overflow-y-auto px-4 pt-5 pb-24 sm:px-8 sm:pt-7 md:pb-[60px]"
         >
           <Outlet
             context={{ coupleMode, openEditModal } satisfies AppOutletContext}
           />
         </main>
       </div>
+
+      <MobileNav />
 
       <NewTransactionModal
         open={modalOpen}

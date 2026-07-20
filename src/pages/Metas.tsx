@@ -8,7 +8,7 @@ export function Metas() {
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
-    <div className="grid grid-cols-2 gap-[18px]">
+    <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2">
       {goals.map((goal) => (
         <GoalCard key={goal.id} goal={goal} />
       ))}

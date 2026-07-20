@@ -175,7 +175,7 @@ export function Landing() {
 
   return (
     <div className="bg-bg text-text">
-      <header className="mx-auto flex max-w-[1280px] items-center justify-between px-12 py-[22px]">
+      <header className="mx-auto flex max-w-[1280px] items-center justify-between px-5 sm:px-8 md:px-12 py-[22px]">
         <div className="flex items-center gap-2.5">
           <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-accent font-heading text-sm font-extrabold text-accent-ink">
             NB
@@ -187,17 +187,17 @@ export function Landing() {
         </Link>
       </header>
 
-      <section className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-14 px-12 pt-14 pb-[90px] md:grid-cols-2">
-        <div className="flex flex-col gap-[22px]">
+      <section className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-10 px-5 sm:px-8 md:px-12 pt-10 pb-16 sm:gap-14 sm:pt-14 sm:pb-[90px] md:grid-cols-2">
+        <div className="flex flex-col gap-5 sm:gap-[22px]">
           <Eyebrow>Finanças a dois</Eyebrow>
-          <h1 className="m-0 font-heading text-[52px] leading-[1.08] font-black tracking-tight text-balance">
+          <h1 className="m-0 font-heading text-[34px] leading-[1.1] font-black tracking-tight text-balance sm:text-[42px] md:text-[52px] md:leading-[1.08]">
             O dinheiro de vocês dois, numa página só.
           </h1>
-          <p className="m-0 max-w-[480px] text-[17px] leading-relaxed text-text-secondary">
+          <p className="m-0 max-w-[480px] text-[15.5px] leading-relaxed text-text-secondary sm:text-[17px]">
             Nosso Bolso é o app de finanças pra casais: lancem gastos, acompanhem metas e conversem com uma IA que
             já conhece as contas de vocês.
           </p>
-          <div className="mt-1.5 flex items-center gap-4">
+          <div className="mt-1.5 flex flex-wrap items-center gap-3 sm:gap-4">
             <Link
               to="/login?mode=cadastrar"
               className="rounded-[14px] bg-accent px-[26px] py-[15px] text-[15px] font-bold text-accent-ink shadow-[0_10px_24px_-10px_var(--color-accent)] transition-transform hover:-translate-y-px"
@@ -249,7 +249,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1280px] px-12 pt-5 pb-[100px]">
+      <section className="mx-auto max-w-[1280px] px-5 sm:px-8 md:px-12 pt-5 pb-[100px]">
         <div className="mx-auto mb-12 flex max-w-[560px] flex-col items-center gap-3 text-center">
           <Eyebrow center>Funcionalidades</Eyebrow>
           <h2 className="m-0 font-heading text-[34px] font-extrabold text-balance">
@@ -272,7 +272,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="bg-sidebar px-12 py-[90px]">
+      <section className="bg-sidebar px-5 sm:px-8 md:px-12 py-[90px]">
         <div className="mx-auto flex max-w-[1100px] flex-col gap-[52px]">
           <h2 className="m-0 text-center font-heading text-[34px] font-extrabold text-bg">
             Em 3 passos, sem planilha
@@ -327,7 +327,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1280px] px-12 py-[90px]">
+      <section className="mx-auto max-w-[1280px] px-5 sm:px-8 md:px-12 py-[90px]">
         <Eyebrow center>O que os casais dizem</Eyebrow>
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
           {testimonials.map((t) => (
@@ -350,7 +350,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1280px] px-12 pb-[100px]">
+      <section className="mx-auto max-w-[1280px] px-5 sm:px-8 md:px-12 pb-[100px]">
         <h2 className="mb-9 text-center font-heading text-[30px] font-extrabold">Perguntas frequentes</h2>
         <div className="mx-auto flex max-w-[760px] flex-col gap-2.5">
           {faqs.map((item, i) => (
@@ -365,7 +365,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="bg-pill-bg px-12 py-[90px] text-center">
+      <section className="bg-pill-bg px-5 sm:px-8 md:px-12 py-[90px] text-center">
         <h2 className="mx-auto mb-4.5 max-w-[640px] font-heading text-[32px] font-extrabold text-balance">
           Comecem a organizar as finanças de vocês hoje
         </h2>
@@ -378,9 +378,9 @@ export function Landing() {
         </Link>
       </section>
 
-      <footer className="mx-auto flex max-w-[1280px] items-center justify-between px-12 py-10">
+      <footer className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3 px-5 sm:px-8 md:px-12 py-10">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-accent font-heading text-xs font-extrabold text-accent-ink">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px] bg-accent font-heading text-xs font-extrabold text-accent-ink">
             NB
           </div>
           <div className="text-[13px] text-text-secondary">Nosso Bolso — feito pra quem divide a vida a dois.</div>

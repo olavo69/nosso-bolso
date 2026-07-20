@@ -32,8 +32,8 @@ export function PeriodBar({
   onCustomEndChange,
 }: PeriodBarProps) {
   return (
-    <div className="flex items-center gap-3.5">
-      <div className="flex items-center gap-3.5 rounded-[14px] border border-border bg-surface px-3.5 py-2">
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-2 rounded-[14px] border border-border bg-surface px-3 py-2 sm:gap-3.5 sm:px-3.5">
         <button
           type="button"
           onClick={onPrevMonth}
@@ -53,13 +53,13 @@ export function PeriodBar({
         </button>
       </div>
 
-      <div className="flex gap-0.5 rounded-control bg-pill-bg p-1">
+      <div className="flex gap-0.5 overflow-x-auto rounded-control bg-pill-bg p-1">
         {periodOptions.map((option) => (
           <button
             key={option.key}
             type="button"
             onClick={() => onPeriodModeChange(option.key)}
-            className={`rounded-[10px] px-3.5 py-2 text-[12.5px] font-bold transition-colors ${
+            className={`shrink-0 rounded-[10px] px-2.5 py-1.5 text-[11.5px] font-bold whitespace-nowrap transition-colors sm:px-3.5 sm:py-2 sm:text-[12.5px] ${
               periodMode === option.key
                 ? 'bg-text text-bg'
                 : 'text-text-secondary'

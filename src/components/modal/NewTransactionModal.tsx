@@ -202,11 +202,11 @@ export function NewTransactionModal({
   return (
     <div
       onClick={onClose}
-      className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,18,15,0.45)]"
+      className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,18,15,0.45)] p-0 sm:p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="pop-in flex w-[440px] flex-col gap-4 rounded-[22px] bg-surface p-[26px]"
+        className="pop-in flex h-full w-full max-w-full flex-col gap-4 overflow-y-auto rounded-none bg-surface p-5 sm:h-auto sm:max-h-[88vh] sm:w-[440px] sm:max-w-[440px] sm:rounded-[22px] sm:p-[26px]"
         style={{ animationDuration: '0.25s' }}
       >
         <div className="flex items-center justify-between">

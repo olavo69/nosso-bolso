@@ -6,7 +6,7 @@ export function Sidebar() {
   const { signOut } = useAuth()
 
   return (
-    <aside className="flex w-[232px] shrink-0 flex-col gap-7 bg-sidebar p-4 pt-6">
+    <aside className="hidden w-[232px] shrink-0 flex-col gap-7 bg-sidebar p-4 pt-6 md:flex">
       <div className="flex items-center gap-2.5 px-2">
         <div className="flex h-9 w-9 items-center justify-center rounded-[11px] bg-accent font-heading text-[15px] font-extrabold text-accent-ink">
           NB

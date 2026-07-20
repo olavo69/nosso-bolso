@@ -95,8 +95,8 @@ export function Chat() {
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-200px)] max-w-[720px] flex-col rounded-card border border-border bg-surface">
-      <div className="flex items-center gap-2.5 border-b border-row-border px-[22px] py-4">
+    <div className="mx-auto flex h-[calc(100vh-260px)] max-w-[720px] flex-col rounded-card border border-border bg-surface sm:h-[calc(100vh-200px)]">
+      <div className="flex items-center gap-2.5 border-b border-row-border px-4 py-3.5 sm:px-[22px] sm:py-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-accent font-heading text-[13px] font-extrabold">
           IA
         </div>
@@ -108,14 +108,14 @@ export function Chat() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3.5 overflow-y-auto px-[22px] py-5">
+      <div className="flex flex-1 flex-col gap-3.5 overflow-y-auto px-4 py-4 sm:px-[22px] sm:py-5">
         {messages.map((m, i) => (
           <div
             key={i}
             className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[75%] px-4 py-2.5 text-[13.5px] ${
+              className={`max-w-[85%] px-4 py-2.5 text-[13.5px] sm:max-w-[75%] ${
                 m.from === 'user'
                   ? 'rounded-[14px_14px_4px_14px] bg-accent font-semibold text-accent-ink'
                   : 'rounded-[14px_14px_14px_4px] bg-bg text-text'
@@ -139,7 +139,7 @@ export function Chat() {
         )}
       </div>
 
-      <div className="flex flex-col gap-2.5 border-t border-row-border px-[18px] py-3.5">
+      <div className="flex flex-col gap-2.5 border-t border-row-border px-3.5 py-3 sm:px-[18px] sm:py-3.5">
         <div className="flex flex-wrap gap-2">
           {suggestions.map((s) => (
             <button

@@ -22,20 +22,22 @@ export function Topbar({
   const title = view === 'dashboard' && firstName ? `Olá, ${firstName} 👋` : defaultTitle
 
   return (
-    <header className="flex h-[76px] shrink-0 items-center justify-between border-b border-border bg-topbar-bg px-8">
-      <div>
-        <div className="font-heading text-xl font-extrabold">{title}</div>
-        <div className="mt-0.5 text-[13px] text-text-secondary">
+    <header className="flex h-auto min-h-[64px] shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-border bg-topbar-bg px-4 py-2.5 sm:h-[76px] sm:flex-nowrap sm:px-8 sm:py-0">
+      <div className="min-w-0">
+        <div className="truncate font-heading text-base font-extrabold sm:text-xl">
+          {title}
+        </div>
+        <div className="mt-0.5 hidden text-[13px] text-text-secondary sm:block">
           {subtitle}
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <div className="flex gap-0.5 rounded-pill bg-pill-bg p-1">
           <button
             type="button"
             onClick={() => onToggleCouple(false)}
-            className={`rounded-pill px-3.5 py-2 text-[12.5px] font-bold transition-colors ${
+            className={`rounded-pill px-2.5 py-1.5 text-[11.5px] font-bold transition-colors sm:px-3.5 sm:py-2 sm:text-[12.5px] ${
               !coupleMode ? 'bg-surface text-text' : 'text-text-muted'
             }`}
           >
@@ -44,7 +46,7 @@ export function Topbar({
           <button
             type="button"
             onClick={() => onToggleCouple(true)}
-            className={`rounded-pill px-3.5 py-2 text-[12.5px] font-bold transition-colors ${
+            className={`rounded-pill px-2.5 py-1.5 text-[11.5px] font-bold transition-colors sm:px-3.5 sm:py-2 sm:text-[12.5px] ${
               coupleMode ? 'bg-surface text-text' : 'text-text-muted'
             }`}
           >
@@ -52,7 +54,7 @@ export function Topbar({
           </button>
         </div>
 
-        <div className="flex items-center">
+        <div className="hidden items-center sm:flex">
           <div className="z-[2] flex h-[34px] w-[34px] items-center justify-center rounded-full border-2 border-topbar-bg bg-[#D9C9A3] text-xs font-bold text-text">
             {profile ? initials(profile.name) : '…'}
           </div>
@@ -66,9 +68,10 @@ export function Topbar({
         <button
           type="button"
           onClick={onNewTransaction}
-          className="whitespace-nowrap rounded-control bg-accent px-[18px] py-[11px] text-[13.5px] font-bold text-accent-ink shadow-[0_6px_16px_-6px_var(--color-accent)] transition-transform hover:-translate-y-px"
+          className="whitespace-nowrap rounded-control bg-accent px-3 py-2 text-[13px] font-bold text-accent-ink shadow-[0_6px_16px_-6px_var(--color-accent)] transition-transform hover:-translate-y-px sm:px-[18px] sm:py-[11px] sm:text-[13.5px]"
         >
-          + Nova transação
+          <span className="sm:hidden">+</span>
+          <span className="hidden sm:inline">+ Nova transação</span>
         </button>
       </div>
     </header>

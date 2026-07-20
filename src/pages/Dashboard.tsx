@@ -117,7 +117,7 @@ export function Dashboard() {
         periodLabel={label}
       />
 
-      <div className="grid grid-cols-[1.6fr_1fr] items-stretch gap-[18px]">
+      <div className="grid grid-cols-1 items-stretch gap-[18px] lg:grid-cols-[1.6fr_1fr]">
         <SpendChart
           monthlyHistory={chartHistory}
           monthIndex={period.monthIndex}
@@ -126,7 +126,7 @@ export function Dashboard() {
         <CategoryBars catSpend={catSpend} categories={categories} />
       </div>
 
-      <div className="grid grid-cols-[1.3fr_1fr] items-start gap-[18px]">
+      <div className="grid grid-cols-1 items-start gap-[18px] lg:grid-cols-[1.3fr_1fr]">
         <RecentTransactions transactions={recentTx} onEdit={openEditModal} />
         <GoalsInFocus goals={goals} />
       </div>

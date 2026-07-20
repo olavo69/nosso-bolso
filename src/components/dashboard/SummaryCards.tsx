@@ -19,8 +19,8 @@ export function SummaryCards({
   const balanceAnim = useCountUp(balance)
 
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="flex min-w-0 flex-col gap-1.5 rounded-[18px] bg-sidebar p-5 text-bg">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="flex min-w-0 flex-col gap-1.5 rounded-[18px] bg-sidebar p-4 text-bg sm:p-5">
         <div className="text-[12.5px] font-semibold text-[#A9AA9F]">
           Saldo do mês
         </div>
@@ -32,7 +32,7 @@ export function SummaryCards({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5 rounded-card border border-border bg-surface p-[22px_24px]">
+      <div className="flex min-w-0 flex-col gap-1.5 rounded-card border border-border bg-surface p-4 sm:p-[22px_24px]">
         <div className="text-[12.5px] font-semibold text-text-secondary">
           Receitas
         </div>
@@ -42,7 +42,7 @@ export function SummaryCards({
         <div className="text-xs text-text-muted">{periodLabel}</div>
       </div>
 
-      <div className="flex flex-col gap-1.5 rounded-card border border-border bg-surface p-[22px_24px]">
+      <div className="flex min-w-0 flex-col gap-1.5 rounded-card border border-border bg-surface p-4 sm:p-[22px_24px]">
         <div className="text-[12.5px] font-semibold text-text-secondary">
           Despesas
         </div>
@@ -52,7 +52,7 @@ export function SummaryCards({
         <div className="text-xs text-text-muted">{periodLabel}</div>
       </div>
 
-      <div className="flex flex-col gap-1.5 rounded-card border border-border bg-surface p-[22px_24px]">
+      <div className="flex min-w-0 flex-col gap-1.5 rounded-card border border-border bg-surface p-4 sm:p-[22px_24px]">
         <div className="text-[12.5px] font-semibold text-text-secondary">
           Investido
         </div>
