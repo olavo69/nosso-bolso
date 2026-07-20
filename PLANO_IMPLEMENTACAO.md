@@ -131,7 +131,49 @@ Anotado para depois da Fase 12. Ainda sem decisão de abordagem (React Native/Ex
 
 ## Fase 14 — Integração com WhatsApp
 
-Anotado, sem escopo definido ainda. Tecnicamente viável via Cloud API oficial do Meta (webhook REST, mesmo padrão já usado na Edge Function do Chat) — o ponto de atenção é a verificação de conta Business da Meta pra sair do sandbox de teste, que pode levar de dias a semanas. Falta decidir o caso de uso antes de desenhar a integração: lançar transação mandando mensagem no WhatsApp, receber alertas/notificações, ou os dois.
+### Decisões de arquitetura
+
+**Meta Cloud API (oficial) vs Evolution API** — usar a **Cloud API oficial da Meta**. A Evolution API (e libs parecidas como Baileys/whatsapp-web.js) automatiza o WhatsApp Web sem aprovação da Meta, então sobe muito mais rápido, mas roda por fora dos Termos de Uso do WhatsApp — o número pode ser banido sem aviso, e o app já tem usuários reais com dados financeiros de verdade dependendo disso. Vale a pena começar já o processo de verificação de conta Business (pode levar dias a semanas) em paralelo com o resto do desenvolvimento, em vez de deixar pra depois.
+
+**Precisa de LangChain?** Não. O Chat já funciona hoje chamando o OpenRouter direto (Edge Function + prompt), sem framework por cima. Pra extrair uma transação estruturada de uma mensagem tipo "gastei 50 no mercado", o caminho mais simples é usar **structured output / function calling nativo** do modelo (formato JSON schema, que o OpenRouter já repassa pra a maioria dos modelos), sem precisar de LangChain — LangChain compensa em pipelines multi-etapa com muitas ferramentas e memória complexa, que não é o nosso caso aqui (é basicamente "texto → 1 objeto estruturado → grava no banco").
+
+**Precisa de Python?** Não. Toda a stack já é TypeScript (React no front, Supabase Edge Functions em Deno no back). O webhook do WhatsApp é só mais uma Edge Function nova (`whatsapp-webhook`), no mesmo padrão da função `chat` que já existe — sem introduzir uma segunda linguagem/serviço pra manter.
+
+### Como a IA lança uma transação a partir da mensagem
+
+1. Mensagem chega no número do WhatsApp Business → webhook da Meta → nova Edge Function `whatsapp-webhook`.
+2. A função identifica de qual usuário é o número (ver seção de identificação abaixo) e busca o `couple_id` e as categorias existentes.
+3. Chama o OpenRouter com a mensagem + um "tool" `registrar_transacao` (schema: tipo, valor, categoria, descrição, data, quem) — mesmo modelo já usado no Chat, só trocando o prompt e adicionando a extração estruturada.
+4. Se a extração vier completa e com confiança razoável, grava direto em `transactions` (mesma tabela e RLS de hoje, só que gravado a partir do backend com o `couple_id` correto).
+5. Responde no WhatsApp confirmando o que foi lançado (ex: "Lancei R$ 50,00 em Alimentação ✅") — importante pra dar chance da pessoa corrigir se a IA entendeu errado.
+6. Se a mensagem for ambígua (falta valor, categoria não existe, etc.), a IA pergunta de volta em vez de chutar.
+7. Correção/edição por mensagem (ex: "errado, era R$ 80") fica como melhoria pra depois do MVP, não é bloqueante pra primeira versão.
+
+### Como ela manda relatórios pelo WhatsApp
+
+Duas situações diferentes, porque o WhatsApp trata mensagem "de resposta" e mensagem "iniciada pela empresa" de formas diferentes:
+
+- **Usuário pergunta primeiro** (ex: "como estão nossos gastos esse mês?"): dentro da janela de 24h depois da última mensagem do usuário, dá pra responder com texto livre — reaproveita a mesma lógica de contexto financeiro já usada no Chat (`buildFinancialContext`).
+- **Relatório proativo** (ex: resumo toda segunda-feira, sem o usuário ter mandado nada): fora da janela de 24h, o WhatsApp exige um **template de mensagem pré-aprovado pela Meta** (texto fixo com variáveis, tipo "Resumo semanal: vocês gastaram {{1}} essa semana"). Precisa submeter esse template pra aprovação com antecedência. O disparo em si viria de um job agendado (cron do Supabase ou do Cloudflare) chamando a Cloud API pra cada usuário que tiver optado por receber.
+
+### Como identificar o usuário certo
+
+`profiles.phone` já existe no schema, mas confiar num número digitado num formulário é arriscado (erro de formatação, DDI errado). Melhor reaproveitar o mesmo padrão já usado pro vínculo de casal (código de convite):
+
+1. Em Perfil, um botão "Conectar WhatsApp" gera um código único (RPC parecida com `create_couple`).
+2. O usuário manda esse código como primeira mensagem pro número do bot.
+3. O webhook confirma o código, vincula o `wa_id` (identificador do WhatsApp) ao `profile.id`, e responde confirmando a conexão.
+4. Daí em diante, toda mensagem desse número já cai automaticamente na conta certa, sem precisar confiar em número digitado à mão.
+
+### Ordem sugerida de execução
+
+- [ ] Criar app/conta Business no Meta for Developers e iniciar processo de verificação (demora, então começar cedo)
+- [ ] Migration: coluna/tabela pra vincular `wa_id` ↔ `profile.id` (e código de vínculo, reaproveitando padrão de `couples.invite_code`)
+- [ ] UI em Perfil: botão "Conectar WhatsApp" + exibição do código
+- [ ] Edge Function `whatsapp-webhook`: recebe mensagens, resolve o usuário, chama o OpenRouter com function calling
+- [ ] Fluxo de lançar transação por mensagem (com confirmação/pergunta de volta)
+- [ ] Fluxo de pergunta livre dentro da janela de 24h (reusa `buildFinancialContext`)
+- [ ] Template de relatório proativo + aprovação na Meta + job agendado (fase 2 desse recurso, não bloqueia o lançamento inicial)
 
 ---
 
