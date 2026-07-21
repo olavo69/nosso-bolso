@@ -4,7 +4,7 @@ import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
 
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
-const MODEL = "openai/gpt-oss-20b:free";
+const MODEL = "nvidia/nemotron-3-nano-30b-a3b:free";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
