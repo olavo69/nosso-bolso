@@ -91,7 +91,7 @@ Dados agora vêm do Supabase (Fase 1) via `TransactionsContext`/`CategoriesConte
 - [x] UI de chat (bolhas usuário/bot, chips de sugestão, indicador "digitando…")
 - [x] Contexto financeiro do usuário incluído no prompt (transações, categorias, metas)
 
-Modelo em uso: `openai/gpt-oss-20b:free` (gratuito, testado e estável — outros modelos `:free` testados deram rate limit ou foram descontinuados). Trocar em `supabase/functions/chat/index.ts` (`MODEL`) se quiser algo mais robusto depois de adicionar crédito no OpenRouter.
+Modelo em uso: `nvidia/nemotron-3-nano-30b-a3b:free` (gratuito, 256k de contexto, testado com pergunta financeira real e respondeu certo duas vezes seguidas). Já foi trocado uma vez antes (`openai/gpt-oss-20b:free`, que funcionava mas era mais fraco); `google/gemma-4-31b-it:free` foi testado e descartado (erro 502). Trocar em `supabase/functions/chat/index.ts` (`MODEL`) se quiser algo mais robusto depois de adicionar crédito no OpenRouter.
 
 ## Fase 10 — Perfil
 - [x] Card de perfil (avatar, nome, e-mail) + card do parceiro vinculado
