@@ -12,7 +12,7 @@ import { getPeriodTx, usePeriod } from '../lib/period'
 export function Extrato() {
   const { transactions } = useTransactions()
   const { profile, partnerProfile } = useAuth()
-  const { openEditModal } = useOutletContext<AppOutletContext>()
+  const { coupleMode, openEditModal } = useOutletContext<AppOutletContext>()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
   const [personFilter, setPersonFilter] = useState<PersonFilterValue>('todos')
 
@@ -22,9 +22,17 @@ export function Extrato() {
     ...(partnerProfile ? [{ key: partnerProfile.id, label: partnerProfile.name }] : []),
   ]
 
+  const visibleTx = useMemo(
+    () =>
+      coupleMode
+        ? transactions
+        : transactions.filter((t) => t.pessoa_id === profile?.id),
+    [transactions, coupleMode, profile?.id],
+  )
+
   const monthTx = useMemo(() => {
     const periodTx = getPeriodTx(
-      transactions,
+      visibleTx,
       period.periodMode,
       period.monthIndex,
       period.customStart,
@@ -34,7 +42,7 @@ export function Extrato() {
       .filter((t) => personFilter === 'todos' || t.pessoa_id === personFilter)
       .sort((a, b) => b.data.localeCompare(a.data))
   }, [
-    transactions,
+    visibleTx,
     period.periodMode,
     period.monthIndex,
     period.customStart,

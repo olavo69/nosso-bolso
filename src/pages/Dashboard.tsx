@@ -12,6 +12,7 @@ import type { MonthlyHistory } from '../data/mockData'
 import { useTransactions } from '../context/TransactionsContext'
 import { useGoals } from '../context/GoalsContext'
 import { useCategories } from '../context/CategoriesContext'
+import { useAuth } from '../context/AuthContext'
 import type { AppOutletContext } from '../layouts/AppLayout'
 import { getPeriodTx, periodLabel, usePeriod } from '../lib/period'
 import { ACCENT } from '../lib/theme'
@@ -20,19 +21,28 @@ export function Dashboard() {
   const { transactions } = useTransactions()
   const { goals } = useGoals()
   const { categories } = useCategories()
-  const { openEditModal } = useOutletContext<AppOutletContext>()
+  const { profile } = useAuth()
+  const { coupleMode, openEditModal } = useOutletContext<AppOutletContext>()
   const period = usePeriod(DEFAULT_MONTH_INDEX)
+
+  const visibleTx = useMemo(
+    () =>
+      coupleMode
+        ? transactions
+        : transactions.filter((t) => t.pessoa_id === profile?.id),
+    [transactions, coupleMode, profile?.id],
+  )
 
   const periodTx = useMemo(
     () =>
       getPeriodTx(
-        transactions,
+        visibleTx,
         period.periodMode,
         period.monthIndex,
         period.customStart,
         period.customEnd,
       ),
-    [transactions, period.periodMode, period.monthIndex, period.customStart, period.customEnd],
+    [visibleTx, period.periodMode, period.monthIndex, period.customStart, period.customEnd],
   )
 
   const income = periodTx
@@ -61,7 +71,7 @@ export function Dashboard() {
     const startMonth = Math.max(0, endMonth - 5)
     const history: MonthlyHistory[] = []
     for (let m = startMonth; m <= endMonth; m++) {
-      const monthTx = transactions.filter(
+      const monthTx = visibleTx.filter(
         (t) => new Date(`${t.data}T00:00:00`).getMonth() === m,
       )
       history.push({
@@ -75,17 +85,17 @@ export function Dashboard() {
       })
     }
     return history
-  }, [transactions, period.monthIndex])
+  }, [visibleTx, period.monthIndex])
 
   const recentTx = useMemo(
     () =>
-      transactions
+      visibleTx
         .filter(
           (t) => new Date(`${t.data}T00:00:00`).getMonth() === period.monthIndex,
         )
         .sort((a, b) => b.data.localeCompare(a.data))
         .slice(0, 5),
-    [transactions, period.monthIndex],
+    [visibleTx, period.monthIndex],
   )
 
   const label = periodLabel(
