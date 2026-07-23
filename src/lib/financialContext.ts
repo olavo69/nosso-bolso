@@ -7,6 +7,7 @@ export function buildFinancialContext(
   categories: CategoryRow[],
   goals: GoalRow[],
   monthIndex: number,
+  hasPartner: boolean,
 ) {
   const monthTx = transactions.filter(
     (t) => new Date(`${t.data}T00:00:00`).getMonth() === monthIndex,
@@ -55,7 +56,7 @@ export function buildFinancialContext(
     'Gastos por categoria neste mês:',
     categoriasLines,
     '',
-    'Metas de poupança do casal:',
+    hasPartner ? 'Metas de poupança do casal:' : 'Metas de poupança:',
     metasLines,
   ].join('\n')
 }

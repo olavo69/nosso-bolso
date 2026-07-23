@@ -16,17 +16,22 @@ const suggestions = [
   'Dá pra economizar mais?',
 ]
 
-const welcomeMessage: ChatTurn = {
-  from: 'bot',
-  text: 'Oi! Sou a assistente do Nosso Bolso. Posso te ajudar a entender os gastos do casal. O que quer saber?',
+function buildWelcomeMessage(hasPartner: boolean): ChatTurn {
+  return {
+    from: 'bot',
+    text: hasPartner
+      ? 'Oi! Sou a assistente do Nosso Bolso. Posso te ajudar a entender os gastos do casal. O que quer saber?'
+      : 'Oi! Sou a assistente do Nosso Bolso. Posso te ajudar a entender seus gastos. O que quer saber?',
+  }
 }
 
 export function Chat() {
-  const { profile } = useAuth()
+  const { profile, partnerProfile } = useAuth()
+  const hasPartner = Boolean(partnerProfile)
   const { transactions } = useTransactions()
   const { categories } = useCategories()
   const { goals } = useGoals()
-  const [messages, setMessages] = useState<ChatTurn[]>([welcomeMessage])
+  const [messages, setMessages] = useState<ChatTurn[]>([buildWelcomeMessage(hasPartner)])
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -80,6 +85,7 @@ export function Chat() {
         categories,
         goals,
         DEFAULT_MONTH_INDEX,
+        hasPartner,
       )
       const { data, error: fnError } = await supabase.functions.invoke('chat', {
         body: { message: text, history, financialContext },
