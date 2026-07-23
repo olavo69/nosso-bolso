@@ -43,6 +43,12 @@ Migrations em `supabase/migrations/`. Colunas monetárias usam `double precision
 
 Testado de ponta a ponta: 2 contas reais cadastradas, vinculadas via código de convite, dados mockados originais re-inseridos nelas para comparação visual, e uma 3ª conta não vinculada confirmando que o RLS isola os dados corretamente (não vê nada do casal Ana/Marcos).
 
+**Bug real (23/07) reportado por usuária de fora (Helen)**: cadastro ficava com `couple_id` nulo até a pessoa clicar em "Vincular parceiro" no Perfil — nada obrigava ou lembrava disso. Enquanto isso, `TransactionsContext.addTransactions`/`updateTransaction`/`deleteTransaction` apenas retornavam sem erro quando `couple_id` era nulo, então toda tentativa de lançar receita/despesa fechava o modal como se tivesse salvo, mas nada ia pro banco. Corrigido em duas frentes:
+- `handle_new_user()` (trigger de signup) agora já cria o casal + semeia as categorias padrão automaticamente pra todo cadastro novo (senha ou Google) — `couple_id` nunca mais fica nulo.
+- `TransactionsContext` agora lança erro nesse caso (igual `CategoriesContext`/`GoalsContext` já faziam), e os modais mostram uma mensagem clara em vez de fechar silenciosamente.
+
+Duas contas reais presas nesse estado (Helen e uma outra usuária, Jessica, cadastrada em 20/07) foram corrigidas manualmente no banco.
+
 `pessoa` deixou de ser `'ana'|'marcos'|'casal'` fixo e virou `pessoa_id` (uuid nullable, `null` = casal) — isso mudou `pessoaLabel`, `PersonFilter`, o seletor "Quem" do modal e os avatares da Topbar, que agora resolvem nome/iniciais reais via `AuthContext`.
 
 Nota: `mailer_autoconfirm` foi ativado temporariamente durante os testes (contas de teste sem confirmação por e-mail) e reativado (`false`) em seguida — cadastros agora exigem confirmação por e-mail antes de entrar. O Supabase usa seu mailer próprio no plano gratuito (limite baixo de envios/hora); configurar SMTP próprio fica como item da Fase 11 se o volume de cadastro exigir.
