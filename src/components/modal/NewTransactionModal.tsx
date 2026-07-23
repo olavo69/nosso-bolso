@@ -57,6 +57,8 @@ export function NewTransactionModal({
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const pessoaOptions = [
     { id: 'self', key: profile?.id ?? null, label: profile?.name ?? 'Você' },
@@ -99,6 +101,7 @@ export function NewTransactionModal({
   useEffect(() => {
     if (!open) return
     setConfirmingDelete(false)
+    setError(null)
     if (editing) {
       setModalType(editing.type)
       setForm(formFromTransaction(editing))
@@ -141,47 +144,60 @@ export function NewTransactionModal({
           ? 'a aplicar'
           : 'pendente'
 
-    if (isEditing && editing) {
-      await updateTransaction(editing.id, {
-        data: form.data,
-        descricao: baseDesc,
-        categoria: form.categoria,
-        pessoa_id: form.pessoaId,
-        type: modalType,
-        amount: valorTotal,
-        status,
-      })
+    setSaving(true)
+    setError(null)
+    try {
+      if (isEditing && editing) {
+        await updateTransaction(editing.id, {
+          data: form.data,
+          descricao: baseDesc,
+          categoria: form.categoria,
+          pessoa_id: form.pessoaId,
+          type: modalType,
+          amount: valorTotal,
+          status,
+        })
+        onClose()
+        return
+      }
+
+      const pendingStatus =
+        modalType === 'receita' ? 'a receber' : modalType === 'investimento' ? 'a aplicar' : 'pendente'
+
+      const [y0, m0, d0] = form.data.split('-').map(Number)
+      const count = form.repeticao === 'parcelada' ? form.parcelas : form.repeticao === 'recorrente' ? 12 : 1
+      const amountEach = form.repeticao === 'parcelada' ? +(valorTotal / count).toFixed(2) : valorTotal
+
+      const newTxs: NewTransactionInput[] = []
+      for (let i = 0; i < count; i++) {
+        const dt = new Date(y0, m0 - 1 + i, d0)
+        const desc = form.repeticao === 'parcelada' ? `${baseDesc} (${i + 1}/${count})` : baseDesc
+        newTxs.push({
+          data: dt.toISOString().slice(0, 10),
+          descricao: desc,
+          categoria: form.categoria,
+          pessoa_id: form.pessoaId,
+          type: modalType,
+          amount: amountEach,
+          status: i === 0 ? status : pendingStatus,
+          recorrente: form.repeticao === 'recorrente',
+          parcela_atual: form.repeticao === 'parcelada' ? i + 1 : null,
+          parcela_total: form.repeticao === 'parcelada' ? count : null,
+        })
+      }
+
+      await addTransactions(newTxs)
       onClose()
-      return
+    } catch (err) {
+      const message = err instanceof Error ? err.message : ''
+      setError(
+        message.includes('casal')
+          ? 'Sua conta ainda não tem um casal vinculado — vá em Perfil pra resolver isso antes de lançar transações.'
+          : 'Não consegui salvar. Tenta de novo em instantes.',
+      )
+    } finally {
+      setSaving(false)
     }
-
-    const pendingStatus =
-      modalType === 'receita' ? 'a receber' : modalType === 'investimento' ? 'a aplicar' : 'pendente'
-
-    const [y0, m0, d0] = form.data.split('-').map(Number)
-    const count = form.repeticao === 'parcelada' ? form.parcelas : form.repeticao === 'recorrente' ? 12 : 1
-    const amountEach = form.repeticao === 'parcelada' ? +(valorTotal / count).toFixed(2) : valorTotal
-
-    const newTxs: NewTransactionInput[] = []
-    for (let i = 0; i < count; i++) {
-      const dt = new Date(y0, m0 - 1 + i, d0)
-      const desc = form.repeticao === 'parcelada' ? `${baseDesc} (${i + 1}/${count})` : baseDesc
-      newTxs.push({
-        data: dt.toISOString().slice(0, 10),
-        descricao: desc,
-        categoria: form.categoria,
-        pessoa_id: form.pessoaId,
-        type: modalType,
-        amount: amountEach,
-        status: i === 0 ? status : pendingStatus,
-        recorrente: form.repeticao === 'recorrente',
-        parcela_atual: form.repeticao === 'parcelada' ? i + 1 : null,
-        parcela_total: form.repeticao === 'parcelada' ? count : null,
-      })
-    }
-
-    await addTransactions(newTxs)
-    onClose()
   }
 
   async function handleDelete() {
@@ -415,6 +431,12 @@ export function NewTransactionModal({
           </button>
         )}
 
+        {error && (
+          <div className="rounded-control bg-[#F7E9E4] px-3.5 py-2.5 text-[12.5px] text-despesa">
+            {error}
+          </div>
+        )}
+
         <div className="mt-1.5 flex gap-2.5">
           <button
             type="button"
@@ -425,10 +447,11 @@ export function NewTransactionModal({
           </button>
           <button
             type="button"
+            disabled={saving}
             onClick={handleSave}
-            className="flex-1 rounded-control bg-accent py-3.5 text-center text-[13.5px] font-bold text-accent-ink"
+            className="flex-1 rounded-control bg-accent py-3.5 text-center text-[13.5px] font-bold text-accent-ink disabled:opacity-60"
           >
-            Salvar
+            {saving ? 'Salvando…' : 'Salvar'}
           </button>
         </div>
       </div>

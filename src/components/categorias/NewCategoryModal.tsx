@@ -66,7 +66,9 @@ export function NewCategoryModal({
       setError(
         message.includes('duplicate') || message.includes('unique')
           ? 'Já existe uma categoria com esse nome nesse tipo.'
-          : 'Não consegui salvar a categoria. Tenta de novo.',
+          : message.includes('casal')
+            ? 'Sua conta ainda não tem um casal vinculado — vá em Perfil pra resolver isso antes de criar categorias.'
+            : 'Não consegui salvar a categoria. Tenta de novo.',
       )
     } finally {
       setSaving(false)

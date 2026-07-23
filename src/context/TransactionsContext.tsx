@@ -48,7 +48,8 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
   }, [profile?.couple_id])
 
   async function addTransactions(rows: NewTransactionInput[]) {
-    if (!supabase || !profile?.couple_id) return
+    if (!supabase) throw new Error('Supabase não configurado.')
+    if (!profile?.couple_id) throw new Error('Sem casal vinculado.')
     const withCouple = rows.map((r) => ({ ...r, couple_id: profile.couple_id }))
     const { error } = await supabase.from('transactions').insert(withCouple)
     if (error) throw error
@@ -56,14 +57,16 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
   }
 
   async function updateTransaction(id: string, updates: Partial<NewTransactionInput>) {
-    if (!supabase) return
+    if (!supabase) throw new Error('Supabase não configurado.')
+    if (!profile?.couple_id) throw new Error('Sem casal vinculado.')
     const { error } = await supabase.from('transactions').update(updates).eq('id', id)
     if (error) throw error
     await refetch()
   }
 
   async function deleteTransaction(id: string) {
-    if (!supabase) return
+    if (!supabase) throw new Error('Supabase não configurado.')
+    if (!profile?.couple_id) throw new Error('Sem casal vinculado.')
     const { error } = await supabase.from('transactions').delete().eq('id', id)
     if (error) throw error
     await refetch()
