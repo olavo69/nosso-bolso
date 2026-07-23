@@ -186,6 +186,15 @@ Duas situações diferentes, porque o WhatsApp trata mensagem "de resposta" e me
 
 Anotado, sem escopo detalhado ainda. Não é um problema de IA "pesada": ler o arquivo (CSV/Excel), mapear colunas pra data/valor/descrição/categoria/tipo (com o usuário confirmando o mapeamento antes de importar) e gravar em lote em `transactions` — parecido com o que a função `addTransactions` já faz pro parcelamento. IA entra só num ponto pontual, se a planilha não tiver categoria já definida: classificar a descrição numa das categorias existentes (chamada simples ao modelo, sem RAG nem banco vetorial).
 
+## Fase 16 — Chat lança transação por texto ("gastei 250 no mercado")
+
+Anotado, sem implementar ainda. Serve de base pro item "lançar transação por mensagem" da Fase 14 (WhatsApp) — a mesma lógica de function calling dá pra usar nos dois lugares.
+
+- [ ] Edge Function `chat`: adicionar uma "ferramenta" `registrar_transacao` (tipo, valor, categoria, descrição, data) via function calling do OpenRouter
+- [ ] Quando o modelo chamar a ferramenta, gravar direto em `transactions` (couple_id já vem da sessão autenticada) e responder confirmando o que foi lançado
+- [ ] Se faltar dado ou a categoria não existir, a IA pergunta de volta em vez de chutar
+- [ ] `Chat.tsx`: atualizar Extrato/Dashboard automaticamente depois de uma transação criada pelo chat (sem precisar recarregar a página)
+
 ---
 
 ## Como acompanhar
