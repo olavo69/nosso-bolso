@@ -188,12 +188,30 @@ Anotado, sem escopo detalhado ainda. Não é um problema de IA "pesada": ler o a
 
 ## Fase 16 — Chat lança transação por texto ("gastei 250 no mercado")
 
-Anotado, sem implementar ainda. Serve de base pro item "lançar transação por mensagem" da Fase 14 (WhatsApp) — a mesma lógica de function calling dá pra usar nos dois lugares.
+Serve de base pro item "lançar transação por mensagem" da Fase 14 (WhatsApp) — a mesma lógica de function calling dá pra usar nos dois lugares.
 
-- [ ] Edge Function `chat`: adicionar uma "ferramenta" `registrar_transacao` (tipo, valor, categoria, descrição, data) via function calling do OpenRouter
-- [ ] Quando o modelo chamar a ferramenta, gravar direto em `transactions` (couple_id já vem da sessão autenticada) e responder confirmando o que foi lançado
-- [ ] Se faltar dado ou a categoria não existir, a IA pergunta de volta em vez de chutar
-- [ ] `Chat.tsx`: atualizar Extrato/Dashboard automaticamente depois de uma transação criada pelo chat (sem precisar recarregar a página)
+- [x] Edge Function `chat`: ferramenta `registrar_transacao` (tipo, valor, categoria, descrição, data) via function calling do OpenRouter (modelo em uso já suporta `tools`/`tool_choice`)
+- [x] Quando o modelo chama a ferramenta, grava direto em `transactions` (usa `ctx.supabase` — client autenticado do `@supabase/server`, respeitando RLS — em vez de confiar em `couple_id` vindo do client)
+- [x] Se faltar dado ou a categoria não existir, a IA pergunta de volta em vez de chutar
+- [x] `Chat.tsx`: atualiza Extrato/Dashboard automaticamente depois de uma transação criada pelo chat (`refetch` exposto pelo `TransactionsContext`)
+- [x] Correção: a IA "inventava" uma data quando o usuário não mencionava uma (ex: gravou 2025-11-03 pra um lançamento de hoje) — corrigido informando a data real no prompt e validando no servidor com uma margem de segurança (rejeita datas fora de ~1 ano atrás a 7 dias no futuro, usa hoje como padrão)
+
+A função `withSupabase` estava configurada como `{ auth: ["publishable"] }` (não valida usuário, `ctx.userClaims` sempre nulo) — trocado pra `{ auth: ["user"] }` pra dar pra identificar quem está mandando a mensagem.
+
+## Fase 17 — Backup / Point-in-Time Recovery
+
+Anotado, não implementado. Motivado por um erro real (24/07): um `DELETE` mal escopado rodado direto no banco (fora do app) apagou transações de mais de uma conta de uma vez, sem qualquer forma de recuperação — o projeto está no plano gratuito do Supabase, que não inclui backup nem PITR (`pitr_enabled: false`, zero backups físicos, confirmado via `supabase backups list`).
+
+- [ ] Avaliar upgrade pro plano Pro do Supabase (~US$25/mês) quando o app tiver usuários reais dependendo dele no dia a dia
+- [ ] Habilitar PITR (recuperação por timestamp, geralmente com alguns dias de retenção)
+
+Complementar ao soft delete (abaixo): soft delete protege contra erro/bug feito *através do app* (RLS ainda vale); backup/PITR é a única proteção contra erro feito com acesso direto ao banco via credencial de superusuário — que é exatamente o que causou o incidente de 24/07.
+
+## Soft delete em transactions/categories/goals
+
+Implementado em 24/07, junto com o item acima. Em vez de `DELETE` de verdade, `deleteTransaction` agora marca `deleted_at` — a linha nunca some do banco, só fica escondida das consultas normais (filtro `.is('deleted_at', null)` no código, não no RLS — ver nota abaixo). Reversível com um `UPDATE` simples se algo for apagado por engano.
+
+Nota técnica: a primeira tentativa colocou o filtro `deleted_at is null` na política de `SELECT` do RLS, mas isso quebra o próprio `UPDATE` que marca `deleted_at` — o PostgREST sempre faz `RETURNING` internamente (mesmo com `Prefer: return=minimal`), e como a linha recém-atualizada deixa de satisfazer a política de SELECT, o Postgres rejeita o UPDATE inteiro. Corrigido movendo o filtro pro código da aplicação, que é o padrão mais comum pra soft delete por causa dessa exata interação do RLS com RETURNING.
 
 ---
 
