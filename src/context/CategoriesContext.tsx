@@ -10,7 +10,10 @@ import { supabase } from '../lib/supabaseClient'
 import type { CategoryRow } from '../types/db'
 import { useAuth } from './AuthContext'
 
-export type NewCategoryInput = Omit<CategoryRow, 'id' | 'couple_id' | 'created_at'>
+export type NewCategoryInput = Omit<
+  CategoryRow,
+  'id' | 'couple_id' | 'created_at' | 'deleted_at'
+>
 
 type CategoriesContextValue = {
   categories: CategoryRow[]
@@ -32,7 +35,11 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
       return
     }
     setLoading(true)
-    const { data } = await supabase.from('categories').select('*').order('nome')
+    const { data } = await supabase
+      .from('categories')
+      .select('*')
+      .is('deleted_at', null)
+      .order('nome')
     setCategories(data ?? [])
     setLoading(false)
   }

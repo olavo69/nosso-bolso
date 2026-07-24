@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabaseClient'
 import type { GoalRow } from '../types/db'
 import { useAuth } from './AuthContext'
 
-export type NewGoalInput = Omit<GoalRow, 'id' | 'couple_id' | 'created_at'>
+export type NewGoalInput = Omit<GoalRow, 'id' | 'couple_id' | 'created_at' | 'deleted_at'>
 
 type GoalsContextValue = {
   goals: GoalRow[]
@@ -35,6 +35,7 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from('goals')
       .select('*')
+      .is('deleted_at', null)
       .order('created_at')
     setGoals(data ?? [])
     setLoading(false)

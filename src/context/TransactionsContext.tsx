@@ -10,7 +10,10 @@ import { supabase } from '../lib/supabaseClient'
 import type { TransactionRow } from '../types/db'
 import { useAuth } from './AuthContext'
 
-export type NewTransactionInput = Omit<TransactionRow, 'id' | 'couple_id' | 'created_at'>
+export type NewTransactionInput = Omit<
+  TransactionRow,
+  'id' | 'couple_id' | 'created_at' | 'deleted_at'
+>
 
 type TransactionsContextValue = {
   transactions: TransactionRow[]
@@ -18,6 +21,7 @@ type TransactionsContextValue = {
   addTransactions: (rows: NewTransactionInput[]) => Promise<void>
   updateTransaction: (id: string, updates: Partial<NewTransactionInput>) => Promise<void>
   deleteTransaction: (id: string) => Promise<void>
+  refetch: () => Promise<void>
 }
 
 const TransactionsContext = createContext<TransactionsContextValue | null>(null)
@@ -37,6 +41,7 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from('transactions')
       .select('*')
+      .is('deleted_at', null)
       .order('data', { ascending: false })
     setTransactions(data ?? [])
     setLoading(false)
@@ -67,13 +72,18 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
   async function deleteTransaction(id: string) {
     if (!supabase) throw new Error('Supabase não configurado.')
     if (!profile?.couple_id) throw new Error('Sem casal vinculado.')
-    const { error } = await supabase.from('transactions').delete().eq('id', id)
+    // soft delete: marca deleted_at em vez de apagar de verdade, pra dar pra
+    // reverter em caso de erro (nosso ou do usuário)
+    const { error } = await supabase
+      .from('transactions')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
     if (error) throw error
     await refetch()
   }
 
   const value = useMemo(
-    () => ({ transactions, loading, addTransactions, updateTransaction, deleteTransaction }),
+    () => ({ transactions, loading, addTransactions, updateTransaction, deleteTransaction, refetch }),
     [transactions, loading, profile?.couple_id],
   )
 

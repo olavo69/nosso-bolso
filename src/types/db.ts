@@ -17,6 +17,7 @@ export type CategoryRow = {
   hue: number
   budget: number | null
   created_at: string
+  deleted_at: string | null
 }
 
 export type GoalRow = {
@@ -28,6 +29,7 @@ export type GoalRow = {
   prazo: string
   hue: number
   created_at: string
+  deleted_at: string | null
 }
 
 export type TransactionRow = {
@@ -44,6 +46,7 @@ export type TransactionRow = {
   parcela_atual: number | null
   parcela_total: number | null
   created_at: string
+  deleted_at: string | null
 }
 
 export type ChatMessageRow = {

@@ -28,7 +28,7 @@ function buildWelcomeMessage(hasPartner: boolean): ChatTurn {
 export function Chat() {
   const { profile, partnerProfile } = useAuth()
   const hasPartner = Boolean(partnerProfile)
-  const { transactions } = useTransactions()
+  const { transactions, refetch: refetchTransactions } = useTransactions()
   const { categories } = useCategories()
   const { goals } = useGoals()
   const [messages, setMessages] = useState<ChatTurn[]>([buildWelcomeMessage(hasPartner)])
@@ -93,6 +93,9 @@ export function Chat() {
       if (fnError) throw fnError
       setMessages((m) => [...m, { from: 'bot', text: data.reply }])
       persistMessage('bot', data.reply)
+      if (data.transactionCreated) {
+        await refetchTransactions()
+      }
     } catch {
       setError('Não consegui falar com a IA agora. Tenta de novo em instantes.')
     } finally {
