@@ -19,7 +19,7 @@ Libs de apoio: `@supabase/supabase-js`, `@tanstack/react-query` (cache de dados)
 - [x] Instalar e configurar Tailwind (cores, fontes Nunito/Inter, radius conforme tokens)
 - [x] Instalar libs de apoio (lista acima)
 - [x] Criar projeto no Supabase (`nosso-bolso`, ref `uzmicducyxwkbbddlkxl`) — feito na Fase 9, sob demanda
-- [ ] Conectar repo ao Cloudflare Pages (build command, preview deploys automáticos por PR)
+- [x] Conectar repo ao Cloudflare Pages (build command, preview deploys automáticos por PR) — feito na Fase 11
 
 ## Fase 1 — Modelagem de dados (Supabase)
 - [x] `profiles` (usuário: nome, moeda, plano, `couple_id`)
@@ -212,6 +212,31 @@ Complementar ao soft delete (abaixo): soft delete protege contra erro/bug feito 
 Implementado em 24/07, junto com o item acima. Em vez de `DELETE` de verdade, `deleteTransaction` agora marca `deleted_at` — a linha nunca some do banco, só fica escondida das consultas normais (filtro `.is('deleted_at', null)` no código, não no RLS — ver nota abaixo). Reversível com um `UPDATE` simples se algo for apagado por engano.
 
 Nota técnica: a primeira tentativa colocou o filtro `deleted_at is null` na política de `SELECT` do RLS, mas isso quebra o próprio `UPDATE` que marca `deleted_at` — o PostgREST sempre faz `RETURNING` internamente (mesmo com `Prefer: return=minimal`), e como a linha recém-atualizada deixa de satisfazer a política de SELECT, o Postgres rejeita o UPDATE inteiro. Corrigido movendo o filtro pro código da aplicação, que é o padrão mais comum pra soft delete por causa dessa exata interação do RLS com RETURNING.
+
+## Fase 18 — Auditoria de prontidão pra produção (25/07)
+
+Levantamento do que falta antes de divulgar o app pra mais gente, organizado por urgência.
+
+### 🔴 Bloqueante / alto risco
+
+- [ ] Backup/PITR — ver Fase 17 (já vivemos o incidente real de perda de dados)
+- [ ] Rate limit de e-mail do Supabase (2/hora no plano grátis) — trava cadastro assim que passar de ~2 pessoas se cadastrando na mesma hora; precisa de SMTP próprio (Resend/SendGrid) pra sair do limite
+- [ ] Error Boundary no React — hoje, se qualquer componente quebrar em produção, a tela fica branca sem mensagem, sem log, sem recuperação
+- [ ] Exclusão de conta de verdade — hoje só existe "resetar dados" (apaga transações/metas, mantém a conta viva); relevante pra LGPD (direito de apagar os próprios dados)
+
+### 🟡 Importante, não bloqueia o lançamento
+
+- [ ] Editar/excluir categorias e metas — hoje só dá pra criar; erro de digitação fica permanente
+- [ ] Fallback de modelo de IA — Chat e "lançar transação por texto" (Fase 16) dependem de um único modelo grátis do OpenRouter; se cair ou for descontinuado, a feature quebra sem aviso (já aconteceu antes nesse projeto)
+- [ ] Monitoramento/alerta de erros — hoje só se sabe de um problema se um usuário reclamar (foi o caso do bug do couple_id nulo, achado pela Helen)
+- [ ] Testes automatizados — tudo validado manualmente/scripts ad-hoc até aqui; regressão futura só é pega na mão
+- [ ] Code-splitting do bundle — ~520KB num chunk só, Vite avisa disso a cada build
+
+### 🟢 Cosmético / depois
+
+- [ ] Página de Termos de Uso / Política de Privacidade
+- [ ] Senha mínima de 6 caracteres (padrão do Supabase — considerar aumentar pra um app financeiro)
+- [ ] Domínio customizado (Fase 11, opcional)
 
 ---
 
